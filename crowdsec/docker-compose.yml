@@ -12,6 +12,7 @@ services:
     environment:
       - TZ=Europe/Rome
       - COLLECTIONS=crowdsecurity/nginx-proxy-manager crowdsecurity/nginx crowdsecurity/base-http-scenarios crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/sshd crowdsecurity/linux crowdsecurity/postfix crowdsecurity/dovecot
+      - PARSERS=crowdsecurity/nextcloud-whitelist   # niente ban per il traffico normale di Nextcloud (WebDAV di Joplin/app: 404 su DELETE/PROPFIND)
       - BOUNCER_KEY_firewall=${BOUNCER_KEY_FIREWALL}
       # utente della API usato dal motore e dal widget di homepage (http://crowdsec:8080)
       - AGENT_USERNAME=crowdsec-agent
