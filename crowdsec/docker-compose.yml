@@ -1,0 +1,37 @@
+# CrowdSec: legge i log di Nginx Proxy Manager e decide quali IP bloccare.
+# Il blocco vero lo fa crowdsec-firewall-bouncer installato sull'host (apt), che interroga
+# questa API su 127.0.0.1:8180. IP sempre ammessi: whitelist di rete + allowlist "casa"
+# (IP pubblico aggiornato da scripts/crowdsec_allow_myip.sh).
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:v1.8.1
+    container_name: crowdsec
+    restart: always
+    dns:
+      - 192.168.1.100
+    environment:
+      - TZ=Europe/Rome
+      - COLLECTIONS=crowdsecurity/nginx-proxy-manager crowdsecurity/nginx crowdsecurity/base-http-scenarios crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/sshd crowdsecurity/linux
+      - BOUNCER_KEY_firewall=${BOUNCER_KEY_FIREWALL}
+      # utente della API usato dal motore e dal widget di homepage (http://crowdsec:8080)
+      - AGENT_USERNAME=crowdsec-agent
+      - AGENT_PASSWORD=${CROWDSEC_AGENT_PASSWORD}
+      # collegamento alla CrowdSec Console (app.crowdsec.net): l istanza va accettata dalla console
+      - ENROLL_KEY=${ENROLL_KEY}
+      - ENROLL_INSTANCE_NAME=rpi5-homeserver
+    ports:
+      - "127.0.0.1:8180:8080"
+    volumes:
+      - ./acquis.yaml:/etc/crowdsec/acquis.yaml:ro
+      - ./whitelist-casa.yaml:/etc/crowdsec/parsers/s02-enrich/whitelist-casa.yaml:ro
+      - /mnt/external_drive/crowdsec/data:/var/lib/crowdsec/data
+      - /mnt/external_drive/crowdsec/config:/etc/crowdsec
+      - /mnt/external_drive/nginx-proxy-manager/data/logs:/var/log/npm:ro
+      - /var/log:/var/log/host:ro
+    mem_limit: 512m
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

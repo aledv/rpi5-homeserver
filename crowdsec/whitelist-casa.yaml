@@ -1,0 +1,10 @@
+# Reti che CrowdSec non deve mai segnalare/bloccare
+name: casa/whitelist
+description: "Rete di casa, VPN, reti Docker"
+whitelist:
+  reason: "rete di casa / VPN / docker"
+  cidr:
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "127.0.0.0/8"

@@ -1,0 +1,23 @@
+# Log dei proxy host di NPM (formato NPM)
+filenames:
+  - /var/log/npm/proxy-host-*_access.log
+  - /var/log/npm/proxy-host-*_error.log
+labels:
+  type: nginx-proxy-manager
+---
+# Host di default e fallback di NPM (formato nginx standard): qui arrivano gli scanner senza dominio
+filenames:
+  - /var/log/npm/default-host_access.log
+  - /var/log/npm/default-host_error.log
+  - /var/log/npm/fallback_access.log
+  - /var/log/npm/fallback_error.log
+  - /var/log/npm/fallback_http_access.log
+  - /var/log/npm/fallback_http_error.log
+labels:
+  type: nginx
+---
+# SSH dell host (porta 22 aperta su internet): /var/log/auth.log scritto da rsyslog (installato da install.sh)
+filenames:
+  - /var/log/host/auth.log
+labels:
+  type: syslog

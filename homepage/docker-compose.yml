@@ -1,0 +1,20 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    dns:
+      - 192.168.1.100
+    ports:
+      - 3002:3000
+    volumes:
+      - /mnt/external_drive/homepage:/app/config # Make sure your local config directory exists
+    env_file: .env # HOMEPAGE_VAR_* usate in services.yaml (escluso da git)
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homepage.${DOMAIN} # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

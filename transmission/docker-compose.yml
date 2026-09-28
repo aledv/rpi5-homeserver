@@ -1,0 +1,24 @@
+services:
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    restart: unless-stopped
+    ports:
+      - "9091:9091"    # Porta per l'interfaccia web
+      - "51413:51413"  # Porta per il traffico dei torrent
+    volumes:
+      - /mnt/external_drive/transmission:/config
+      - /mnt/external_drive/downloads:/downloads  # Cartella dove scaricare i torrent
+    environment:
+      - PUID=1000  # ID utente (modifica se necessario)
+      - PGID=1000  # ID gruppo (modifica se necessario)
+      - TZ=Europe/Rome  # Fuso orario (modifica se necessario)
+      - USER=${TRANSMISSION_USER}
+      - PASS=${PASS}
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 
+

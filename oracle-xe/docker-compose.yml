@@ -1,0 +1,35 @@
+#eseguire scripts/config_os_for_docker_oracle.sh prima di installare il container
+services:
+  oracle:
+    image: gvenzl/oracle-free:23.6-arm64
+    container_name: oracle-xe
+    platform: linux/arm64 # Aggiunta per Raspberry Pi
+    ports:
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      APP_USER: ${APP_USER}
+      APP_USER_PASSWORD: ${APP_USER_PASSWORD}
+      TZ: Europe/Rome
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"] # Assicurati che healthcheck.sh esista nel container
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+      start_interval: 5s
+    volumes:
+      - /mnt/external_drive/oracle/my-init.sql:/container-entrypoint-initdb.d/my-init.sql:ro
+      - /mnt/external_drive/oracle/oracle-data:/opt/oracle/oradata
+      - /mnt/external_drive/oracle/ext-tables:/opt/oracle/oradata/EXT_TABLES_DATA
+    shm_size: 1g # Dimensione della shared memory (consigliata per Oracle)
+    ulimits:
+      memlock: -1 # MGA di Oracle 23ai: evita ORA-00600 [OSDEP_INTERNAL] / ORA-27302 sskgm_mga_at
+    restart: unless-stopped # Riavvia in caso di problemi
+    stop_grace_period: 3m # tempo per lo shutdown pulito di Oracle (evita il crash recovery al riavvio)
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 

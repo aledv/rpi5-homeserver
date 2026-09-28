@@ -1,0 +1,25 @@
+services:
+  openvpn-as:
+    image: openvpn/openvpn-as
+    container_name: openvpn-as
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - MKNOD
+    ports:
+      - 943:943
+      #- 443:443
+      - 41194:41194/udp
+    volumes:
+      - /mnt/external_drive/openvpn:/openvpn
+    networks:
+      - network
+    restart: unless-stopped
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.101.0.0/24

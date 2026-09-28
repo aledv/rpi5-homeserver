@@ -1,0 +1,29 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+# Backup notturno: log in /mnt/external_drive/utility/logs (uno al giorno, tenuti 14 giorni; daily_backup_latest.txt = ultimo)
+0 2 * * * /bin/bash -c 'L=/mnt/external_drive/utility/logs; mkdir -p $L; F=$L/daily_backup_$(date +\%F).txt; /mnt/external_drive/utility/daily_backup.sh > $F 2>&1; rc=$?; ln -sfn $F $L/daily_backup_latest.txt; find $L -name "daily_backup_2*.txt" -mtime +14 -delete; case $rc in 0) m="Message from RPi5: Backup Done!";; 1) m="Message from RPi5: Backup completato, ma con errori nella manutenzione (vedi RIEPILOGO nel log)";; *) m="Message from RPi5: Backup FALLITO (rsync codice $rc)";; esac; curl -s -X POST http://localhost:5000/notify -F "message=$m" -F "file=@$F" >/dev/null'
+0 4 1 * * /bin/bash -c '/mnt/external_drive/utility/renew_cert.sh > /tmp/renew_cert.txt 2>&1 && curl -X POST http://localhost:5000/notify -F "message=Rinnovo certificati per mailserver.example.com eseguito!" -F "file=@/tmp/renew_cert.txt"'
+
+# CrowdSec: tiene l IP pubblico di casa nell allowlist (non va mai bloccato)
+*/5 * * * * /mnt/external_drive/my_rpi_scripts/scripts/crowdsec_allow_myip.sh >> /mnt/external_drive/crowdsec/allow_myip.log 2>&1

@@ -1,0 +1,20 @@
+services:
+  pure-ftpd:
+    image: gists/pure-ftpd
+    container_name: pure-ftpd
+    ports:
+      - "2121:21"
+      - "30000-30009:30000-30009"
+    environment:
+      - PUBLIC_HOST=192.168.1.100
+    volumes:
+      - /mnt/external_drive/pure-ftpd/data:/home/ftpuser
+      - /mnt/external_drive/pure-ftpd/pureftpd:/etc/pureftpd
+    restart: always
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true  
+    

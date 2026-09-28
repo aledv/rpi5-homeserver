@@ -1,0 +1,28 @@
+services:
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    container_name: scrutiny
+    restart: unless-stopped
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    ports:
+      - "8998:8080"
+    env_file:
+      - path: .env # SCRUTINY_NOTIFY_URLS (notifiche Telegram): vedi .env.sample
+        required: false
+    environment:
+      - COLLECTOR_CRON_SCHEDULE=0 */6 * * *
+    volumes:
+      - /run/udev:/run/udev:ro
+      - /mnt/external_drive/scrutiny/config:/opt/scrutiny/config
+      - /mnt/external_drive/scrutiny/influxdb:/opt/scrutiny/influxdb
+    devices:
+      - "/dev/nvme0"
+      - "/dev/sda"
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

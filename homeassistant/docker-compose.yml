@@ -1,0 +1,17 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    network_mode: host
+    # 27/09: al posto di privileged, solo cio che serve:
+    # chiavetta Zigbee ConBee II per ZHA (la configurazione di ZHA usa /dev/ttyACM0) e Bluetooth dell host via D-Bus
+    cap_add:            # gestione dell adattatore Bluetooth (richiesto da Home Assistant)
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2464430-if00:/dev/ttyACM0
+    volumes:
+      - /mnt/external_drive/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro

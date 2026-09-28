@@ -1,0 +1,24 @@
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    #network_mode: "host" # Necessario per Pi-hole per gestire le richieste DNS
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "4080:80/tcp"
+    environment:
+      TZ: "Europe/Rome" # Imposta il fuso orario
+      WEBPASSWORD: ${WEBPASSWORD} # Password per accedere all'interfaccia web di Pi-hole
+    volumes:
+      - "/mnt/external_drive/pihole/etc-pihole:/etc/pihole"
+      - "/mnt/external_drive/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true  

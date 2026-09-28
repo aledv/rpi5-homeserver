@@ -1,0 +1,13 @@
+services:
+  glances:
+    image: nicolargo/glances
+    container_name: glances
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - GLANCES_OPT=-w
+      - DOCKER_HOST=tcp://127.0.0.1:2375   # docker del .30 in sola lettura (docker-socket-proxy)
+    pid: "host"
+    volumes:
+      - /mnt/external_drive/glances:/glances/conf
+      - /mnt/external_drive:/mnt/external_drive:ro

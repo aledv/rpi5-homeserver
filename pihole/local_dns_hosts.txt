@@ -1,0 +1,30 @@
+# Nomi locali di Pi-hole (Local DNS records): da casa/VPN questi domini puntano direttamente al .30,
+# senza passare dall IP pubblico (altrimenti NPM vede l IP pubblico e le liste "LAN & VPN Only" rispondono 403).
+# Formato: IP nome. Applicati da apply_local_dns.sh (lanciato da install_containers.sh).
+192.168.1.100 beszel.example.com
+192.168.1.100 code-server.example.com
+192.168.1.100 dozzle.example.com
+192.168.1.100 glances.example.com
+192.168.1.100 homeassistant.example.com
+192.168.1.100 homebridge.example.com
+192.168.1.100 homepage.example.com
+192.168.1.100 nextcloud.example.com
+192.168.1.100 nginx.example.com
+192.168.1.100 onlyoffice.example.com
+192.168.1.100 openvpn.example.com
+192.168.1.100 photoprism.example.com
+192.168.1.100 phpmyadmin.example.com
+192.168.1.100 pihole.example.com
+192.168.1.100 plex.example.com
+192.168.1.100 portainer.example.com
+192.168.1.100 roundcube.example.com
+192.168.1.100 scanservjs.example.com
+192.168.1.100 scrutiny.example.com
+192.168.1.100 speedtest-tracker.example.com
+192.168.1.100 stirling.example.com
+192.168.1.100 transmission.example.com
+192.168.1.100 umami.example.com
+192.168.1.100 ups.example.com
+192.168.1.100 uptimekuma.example.com
+192.168.1.100 vaultwarden.example.com
+192.168.1.100 wireguard.example.com

@@ -1,0 +1,27 @@
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:16  # fissata il 27/09: aggiorna solo le patch
+    container_name: mailserver
+    # Provide the FQDN of your mail server here (Your DNS MX record should point to this value)
+    hostname: mailserver.${DOMAIN}
+    env_file: /mnt/external_drive/mailserver/mailserver.env
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
+    network_mode: host
+    volumes:
+      - /mnt/external_drive/mailserver/mail-data/:/var/mail/
+      - /mnt/external_drive/mailserver/mail-state/:/var/mail-state/
+      - /mnt/external_drive/mailserver/mail-logs/:/var/log/mail/
+      - /mnt/external_drive/mailserver/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      - /mnt/external_drive/mailserver/letsencrypt:/etc/letsencrypt
+      - /mnt/external_drive/mailserver/docker-data/certbot/certs/:/etc/letsencrypt
+    restart: always
+    stop_grace_period: 1m
+    # Uncomment if using `ENABLE_FAIL2BAN=1`:
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0

@@ -1,0 +1,10 @@
+version: 1
+devices:
+  - device: /dev/sda
+    type:
+      - jmb39x-q,0
+      - jmb39x-q,1
+      - jmb39x-q,2
+      - jmb39x-q,3
+  - device: /dev/nvme0
+    type: nvme

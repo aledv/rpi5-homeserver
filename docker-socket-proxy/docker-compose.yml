@@ -1,0 +1,28 @@
+# Accesso in SOLA LETTURA a Docker del .30 per i container di monitoraggio
+# (homepage, uptime-kuma, dozzle, glances, beszel-agent), al posto di /var/run/docker.sock.
+# Chi monta il socket direttamente può controllare tutto l host; col proxy si può solo leggere.
+# Restano sul socket diretto solo watchtower e portainer, che devono creare e ricreare container.
+services:
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    container_name: docker-socket-proxy
+    restart: always
+    environment:
+      CONTAINERS: 1   # GET /containers/* (lista, inspect, stats, log)
+      INFO: 1         # GET /info (dozzle, beszel)
+      EVENTS: 1       # GET /events (dozzle)
+      POST: 0         # nessuna scrittura
+      IMAGES: 0
+      NETWORKS: 0
+      VOLUMES: 0
+      EXEC: 0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:2375:2375"   # per glances e beszel-agent (network_mode: host)
+    networks:
+      - shared_network          # per gli altri: tcp://docker-socket-proxy:2375
+
+networks:
+  shared_network:
+    external: true

@@ -1,0 +1,20 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"  # Porta MQTT standard
+      - "9001:9001"  # Porta WebSocket (opzionale)
+    volumes:
+      - /mnt/external_drive/mosquitto/config:/mosquitto/config
+      - /mnt/external_drive/mosquitto/data:/mosquitto/data
+      - /mnt/external_drive/mosquitto/log:/mosquitto/log
+    environment:
+      - TZ=Europe/Rome
+    networks:
+      - shared_network
+    
+networks:
+  shared_network:
+    external: true      

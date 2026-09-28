@@ -1,0 +1,19 @@
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    #ports:
+    #  - "32400:32400"
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - VERSION=docker
+      - PLEX_CLAIM=claim-etGurua2PyY8hRzJga9j
+    volumes:
+      - /mnt/external_drive/plex:/config
+      - /mnt/external_drive/Music:/data/Music
+      - /mnt/external_drive/Movies:/data/Movies
+      - /mnt/external_drive/SerieTV:/data/SerieTV
+    restart: unless-stopped

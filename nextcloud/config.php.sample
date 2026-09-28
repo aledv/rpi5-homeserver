@@ -1,0 +1,67 @@
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' => 
+  array (
+    0 => 
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 => 
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' => 
+  array (
+    'host' => 'redis',
+    'password' => '',
+    'port' => 6379,
+  ),
+  'upgrade.disable-web' => true,
+  'instanceid' => 'ocjhain6itpl',
+  'passwordsalt' => '3PVeXkkcc4FHzuyhfRbL92P7wJ8gE1',
+  'secret' => 'IMA++Z2ld0FChpbqcuETwtdqYBfvfKsr5q/u15YLcgbtRHbe',
+  'trusted_domains' => 
+  array (
+    0 => 'nextcloud.<DOMINIO>',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '31.0.0.18',
+  'overwrite.cli.url' => 'http://nextcloud.<DOMINIO>',
+  'overwriteprotocol' => 'https',
+  'trusted_proxies' => 
+  array (
+    0 => '192.168.1.1',
+  ),
+  'dbname' => 'nextcloud',
+  'dbhost' => 'db',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'nextcloud',
+  'dbpassword' => 'yourpassword',
+  'installed' => true,
+  'maintenance' => false,
+  'maintenance_window_start' => 3,
+  'mail_smtpmode' => 'smtp',
+  'mail_sendmailmode' => 'smtp',
+  'mail_from_address' => 'nextcloud',
+  'mail_domain' => '<DOMINIO>',
+  'mail_smtphost' => 'mailserver.<DOMINIO>',
+  'mail_smtpport' => '587',
+  'mail_smtpauth' => true,
+  'mail_smtpname' => '<ADMIN_EMAIL>',
+  'mail_smtppassword' => '<SMTP_PASSWORD>',
+  'default_phone_region' => 'IT',
+  'filelocking.enabled' => true,
+  'loglevel' => 2,
+);

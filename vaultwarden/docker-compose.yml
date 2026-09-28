@@ -1,0 +1,17 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: always
+    environment:
+      - SIGNUPS_ALLOWED=false   # 27/09: niente registrazioni pubbliche (il servizio è esposto su internet)
+    ports:
+      - "9283:80"
+    volumes:
+      - /mnt/external_drive/vaultwarden:/data
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 

@@ -1,0 +1,26 @@
+services:
+  onlyoffice:
+    image: onlyoffice/documentserver:9.4  # fissata il 27/09: aggiorna solo le patch
+    container_name: onlyoffice
+    mem_limit: 1g # limite anti-picchi (2026-09-25)
+    restart: unless-stopped
+    ports:
+      - "8443:80"
+    environment:
+      - JWT_ENABLED=true
+      - JWT_SECRET=${JWT_SECRET}  # Cambia con una chiave sicura
+      - JWT_HEADER=Authorization
+    volumes:
+      - /mnt/external_drive/onlyoffice/data:/var/www/onlyoffice/Data
+      - /mnt/external_drive/onlyoffice/logs:/var/log/onlyoffice
+      - /mnt/external_drive/onlyoffice/lib:/var/lib/onlyoffice
+      - /mnt/external_drive/onlyoffice/fonts:/usr/share/fonts/truetype/custom
+      - /mnt/external_drive/onlyoffice/postgresql:/var/lib/postgresql
+      - /mnt/external_drive/onlyoffice/redis:/var/lib/redis
+      - /mnt/external_drive/onlyoffice/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - nextcloud_network
+
+networks:
+  nextcloud_network:
+    external: true      

@@ -1,0 +1,23 @@
+services:
+  stirling-pdf:
+    image: stirlingtools/stirling-pdf:latest
+    container_name: stirling-pdf
+    mem_limit: 1536m # limite anti-picchi (2026-09-25): JVM 60% heap + LibreOffice on-demand
+    ports:
+      - '8800:8080'
+    volumes:
+      - /mnt/external_drive/stirling/stirling-data/tessdata:/usr/share/tessdata  # OCR language files
+      - /mnt/external_drive/stirling/stirling-data/configs:/configs               # Settings & database
+      - /mnt/external_drive/stirling/stirling-data/logs:/logs                     # Application logs
+      - /mnt/external_drive/stirling/stirling-data/pipeline:/pipeline             # Automation configs
+    environment:
+      - SECURITY_ENABLELOGIN=true       # Opt out of login (default is true / enabled)
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - SYSTEM_DEFAULTLOCALE=en-GB      # Default interface language
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

@@ -1,0 +1,37 @@
+services:
+  watchtower:
+    image: nickfedor/watchtower
+    container_name: watchtower
+    restart: always
+    environment:
+      - TZ=Europe/Rome
+      - WATCHTOWER_HTTP_API_METRICS=true     # Abilita l'endpoint delle metriche
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN} # Token per autenticare le API
+      - WATCHTOWER_HTTP_API_UPDATE=true      # Consente aggiornamenti tramite API
+      - WATCHTOWER_HTTP_API_PORT=8080        # Porta per l'API
+      - WATCHTOWER_INCLUDE_STOPPED=true      # Include i container fermati
+      - WATCHTOWER_HTTP_API_PERIODIC_POLLS=true
+      - WATCHTOWER_CLEANUP=true              # Rimuove le vecchie immagini dopo l'update
+      - WATCHTOWER_SCHEDULE=0 0 9 * * *
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL} 
+      - WATCHTOWER_NOTIFICATIONS=email
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=watchtower@${DOMAIN}
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=${ADMIN_EMAIL}
+        # you have to use a network alias here, if you use your own certificate
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=mailserver.${DOMAIN}
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=${ADMIN_EMAIL}
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=${WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD} 
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=587
+      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY=2
+      #- DOCKER_API_VERSION=1.52
+    ports:
+      - "5168:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

@@ -1,0 +1,13 @@
+services:
+  homebridge:
+    image: homebridge/homebridge
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    # privileged rimosso il 27/09: i plugin usano solo la rete (host network per mDNS/HomeKit)
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Rome
+    volumes:
+      - /mnt/external_drive/homebridge:/homebridge

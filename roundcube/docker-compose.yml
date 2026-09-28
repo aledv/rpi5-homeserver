@@ -1,0 +1,48 @@
+services:
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcube
+    environment:
+      - ROUNDCUBE_DB_TYPE=mysql
+      - ROUNDCUBE_DB_HOST=mariadb
+      - ROUNDCUBE_DB_NAME=roundcube
+      - ROUNDCUBE_DB_USER=roundcube_user
+      - ROUNDCUBE_DB_PASSWORD=${ROUNDCUBE_DB_PASSWORD}
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://mailserver.${DOMAIN}
+      - ROUNDCUBEMAIL_DEFAULT_PORT=993
+      - ROUNDCUBEMAIL_SMTP_SERVER=tls://mailserver.${DOMAIN}
+      - ROUNDCUBEMAIL_SMTP_PORT=587
+      # 2FA con codice da app (27/09): ogni utente la attiva da Impostazioni > 2-Factor Authentication
+      - ROUNDCUBEMAIL_COMPOSER_PLUGINS=alexandregz/twofactor_gauthenticator:dev-master
+      - ROUNDCUBEMAIL_PLUGINS=archive,zipdownload,twofactor_gauthenticator
+    ports:
+      - "1122:80"  # Porta per accedere all'interfaccia web di Roundcube
+    volumes:
+      #- /mnt/external_drive/roundcube/data:/var/www/html
+      - /mnt/external_drive/roundcube/db:/var/roundcube/db
+      # configurazione della 2FA: copiata nel plugin dopo il composer install (quella del plugin è di esempio: solo @tereborace.com e LAN esclusa)
+      - ./twofactor_gauthenticator.config.inc.php:/opt/twofactor_gauthenticator.config.inc.php:ro
+      - ./twofactor_post_setup.sh:/entrypoint-tasks/post-setup/10-twofactor-config.sh:ro
+    depends_on:
+      - mariadb
+    restart: always
+    networks:
+      - network
+      
+  mariadb:
+    image: mariadb:13.0  # fissata il 27/09: Watchtower non fa salti di versione maggiore
+    container_name: roundcube_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=roundcube
+      - MYSQL_USER=roundcube_user
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - /mnt/external_drive/roundcube/mariadb/data:/var/lib/mysql
+    restart: always
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<info>
+  <id>umami_vue</id>
+  <name>Umami Vue Inject</name>
+  <summary>Inject Umami script via Vue component</summary>
+  <version>1.0.0</version>
+  <namespace>UmamiVue</namespace>
+  <category>customization</category>
+  <description>Carica lo script Umami al mount del componente Vue</description>
+  <licence>agpl</licence>
+  <author>AleDV</author>
+  <dependencies>
+    <nextcloud min-version="30" max-version="32"/>
+  </dependencies>
+</info>

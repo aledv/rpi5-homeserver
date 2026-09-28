@@ -1,0 +1,15 @@
+services:
+  samba:
+    image: dockurr/samba
+    container_name: samba
+    network_mode: host
+    environment:
+      USER: "pi"
+      PASS: ${PASS} 
+    volumes:
+      - /mnt/external_drive:/mnt/external_drive         # Prima cartella da condividere
+      - /mnt/external_drive/time_machine_bck:/mnt/external_drive/time_machine_bck # Seconda cartella da condividere
+      - /mnt/external_drive/samba/smb.conf:/etc/samba/smb.conf  # Configurazioni di Samba
+      - /mnt/external_drive/samba/storage:/storage
+      - /mnt/external_drive/samba/shared:/shared # VOLUME dichiarato dall immagine: mappato per evitare un volume anonimo
+    restart: unless-stopped

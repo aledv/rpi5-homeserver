@@ -1,0 +1,48 @@
+services:
+  apcupsd:
+    image: gregewing/apcupsd:latest
+    container_name: apcupsd
+    devices:
+      - /dev/usb/hiddev0 # Dispositivo per la connessione APC UPS
+      - /dev/hidraw0
+    ports:
+      - 3551:3551
+    environment:
+      - UPSNAME=ACP-350 # Nome del tuo UPS
+      - UPSCABLE=usb # Cavo USB per la connessione
+      - UPSTYPE=usb # Tipo di connessione
+      - DEVICE= # Dispositivo USB (vuoto per il rilevamento automatico)
+      - ONBATTERYDELAY=6
+      - BATTERYLEVEL=30
+      - MINUTES=5
+      - TIMEOUT=600
+      - NETSERVER=on # Abilita il servizio di rete per il monitoraggio remoto
+      - NISIP=0.0.0.0 # Ascolta su tutte le interfacce
+      - TZ=Europe/Rome # Imposta il fuso orario
+    volumes:
+      #- /mnt/external_drive/apcupsd:/etc/apcupsd
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    privileged: true # Abilita i permessi avanzati per lo shutdown
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+  apcupsd-cgi:
+    image: bnhf/apcupsd-cgi:latest
+    container_name: apcupsd-cgi
+    dns_search: localdomain # Dominio locale per la risoluzione DNS
+    ports:
+      - 3552:80
+    environment:
+      - UPSHOSTS=apcupsd # Nome del container apcupsd
+      - UPSNAMES=ACP-350 # Nome del tuo UPS da visualizzare
+      - TZ=Europe/Rome # Fuso orario per l'interfaccia web
+    #volumes:
+    #  - /mnt/external_drive/apcupsd/etc:/etc/apcupsd
+    restart: unless-stopped
+    networks:
+      - shared_network
+    
+networks:
+  shared_network:
+    external: true

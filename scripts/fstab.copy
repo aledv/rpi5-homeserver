@@ -1,0 +1,2 @@
+UUID=<YOUR-DRIVE-UUID> /mnt/external_drive ext4 defaults,noatime 0 2
+

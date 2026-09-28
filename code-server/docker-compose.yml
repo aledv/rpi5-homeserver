@@ -1,0 +1,28 @@
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    mem_limit: 1g # limite anti-picchi (2026-09-25)
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD=${PASSWORD} #optional
+      - HASHED_PASSWORD= #optional
+      - SUDO_PASSWORD=${SUDO_PASSWORD} #optional
+      - SUDO_PASSWORD_HASH= #optional
+      - PROXY_DOMAIN=code-server.${DOMAIN} #optional
+      - DEFAULT_WORKSPACE= #optional
+    volumes:
+      - /mnt/external_drive/code-server/config:/config
+      - /mnt/external_drive/my_rpi_scripts:/workspace/my_rpi_scripts
+      - /mnt/external_drive/homepage:/workspace/homepage
+    ports:
+      - 4477:8443
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true    

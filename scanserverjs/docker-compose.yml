@@ -1,0 +1,22 @@
+services:
+  scanservjs:
+    image: sbs20/scanservjs:latest
+    container_name: scanservjs
+    restart: unless-stopped
+    ports:
+      - "8383:8080"  # Mappa la porta 8383 della macchina locale alla porta 8080 del container
+    volumes:
+      - /var/run/dbus:/var/run/dbus  # Monta il volume di dbus per la comunicazione
+      - /mnt/external_drive/scanservjs/scans:/var/lib/scanservjs/output
+      - /mnt/external_drive/scanservjs/cfg:/etc/scanservjs
+    # 27/09: al posto di privileged, solo l accesso ai dispositivi USB (scanner Canon LiDE 100), anche se ricollegato
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    device_cgroup_rules:
+      - "c 189:* rmw"
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true     

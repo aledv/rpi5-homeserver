@@ -1,0 +1,36 @@
+services:
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+      - APP_KEY=base64:M34lj8kkPYlqAnaRArZPawfXjr81nLXeTVS+vDV1n2o=
+      - APP_URL=https://speedtest-tracker.${DOMAIN}
+      - DB_CONNECTION=sqlite
+      - DISPLAY_TIMEZONE=Europe/Rome #optional
+      - PRUNE_RESULTS_OLDER_THAN=30 #optional
+      - SPEEDTEST_SERVERS= #50954,25146,44591,42070,52556,27363,38634,26943,25258,21272,9329,7839,1434,3667,4302,39329,19177,38731,20551,26415
+      - SPEEDTEST_SCHEDULE= 0 3 * * *
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailserver.${DOMAIN}
+      - MAIL_PORT=587
+      - MAIL_USERNAME=${ADMIN_EMAIL}
+      - MAIL_PASSWORD=${MAIL_PASSWORD} 
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS="speedtest-tracker@${DOMAIN}"
+      - MAIL_FROM_NAME="Speedtest Tracker"
+    volumes:
+      - /mnt/external_drive/speedtest-tracker:/config
+    ports:
+      - 7771:80
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 

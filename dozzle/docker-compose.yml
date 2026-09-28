@@ -1,0 +1,18 @@
+services:
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:v11.1.1  # versione fissata
+    restart: unless-stopped # senza, dopo un aggiornamento di watchtower o un riavvio resta fermo
+    environment:
+      # DOZZLE_REMOTE_AGENT: 192.168.1.101:7007   # opzionale: agent Dozzle su un altro host
+      DOCKER_HOST: tcp://docker-socket-proxy:2375 # docker del .30 in sola lettura
+    volumes:
+      - /mnt/external_drive/dozzle_data:/data
+    ports:
+      - 8890:8080
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true
