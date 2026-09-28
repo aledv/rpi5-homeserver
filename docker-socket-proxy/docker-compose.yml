@@ -1,4 +1,4 @@
-# Accesso in SOLA LETTURA a Docker del .30 per i container di monitoraggio
+# Accesso in SOLA LETTURA a Docker dell host per i container di monitoraggio
 # (homepage, uptime-kuma, dozzle, glances, beszel-agent), al posto di /var/run/docker.sock.
 # Chi monta il socket direttamente può controllare tutto l host; col proxy si può solo leggere.
 # Restano sul socket diretto solo watchtower e portainer, che devono creare e ricreare container.

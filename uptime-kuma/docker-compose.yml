@@ -9,7 +9,7 @@ services:
       - "3001:3001"
     volumes:
       - /mnt/external_drive/uptime-kuma:/app/data
-      # docker del .30: host "Docker@RPi5" in Kuma = tcp://docker-socket-proxy:2375 (sola lettura)
+      # docker dell host: host "Docker@RPi5" in Kuma = tcp://docker-socket-proxy:2375 (sola lettura)
     networks:
       - shared_network
 

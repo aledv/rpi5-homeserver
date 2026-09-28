@@ -20,21 +20,20 @@ usernames are read from local `.env` files that are excluded from git
 - **glances**: cross-platform system monitoring.
 - **homeassistant**: home automation platform.
 - **homebridge**: exposes non-HomeKit devices to Apple HomeKit.
-- **homepage**: application dashboard with Docker and service API integrations (bring your own `services.yaml`/`widgets.yaml` in `/mnt/external_drive/homepage/config`).
+- **homepage**: application dashboard with Docker and service API integrations (bring your own `services.yaml`, `widgets.yaml`, … in `homepage/config/`: `install_containers.sh` copies them to `/mnt/external_drive/homepage`).
 - **mailserver**: full mail server (SMTP, IMAP, Rspamd anti-spam) based on docker-mailserver.
 - **mosquitto**: MQTT broker.
 - **nextcloud** (+ MariaDB, Redis): self-hosted file sharing and collaboration.
-- **nginx-proxy-manager**: reverse proxy with Let's Encrypt certificates and access lists.
+- **nginx-proxy-manager** (+ MariaDB): reverse proxy with Let's Encrypt certificates and access lists.
 - **onlyoffice**: online document editor, integrated with Nextcloud.
 - **openvpn** / **wireguard**: VPN servers for remote access.
 - **oracle-xe**: Oracle Database 23ai Free.
 - **photoprism** (+ MariaDB): AI-powered photo management.
-- **phpmyadmin**: MySQL/MariaDB administration.
 - **pihole**: network-wide ad blocker and local DNS (local records kept in `pihole/local_dns_hosts.txt`, applied by `pihole/apply_local_dns.sh`).
 - **plex**: media server.
 - **portainer**: container management UI.
 - **pure-ftpd**: FTP server.
-- **roundcube**: webmail client with two-factor authentication (TOTP plugin, config applied after the plugin install).
+- **roundcube** (+ MariaDB): webmail client with two-factor authentication (TOTP plugin, config applied after the plugin install).
 - **samba**: file shares and Time Machine backups.
 - **scanservjs**: web UI for a network scanner.
 - **scrutiny**: S.M.A.R.T. disk health dashboard (supports disks behind JMicron USB RAID enclosures via `jmb39x-q`).
@@ -105,8 +104,8 @@ Other files that contain secrets are provided as samples as well:
 | `openvpn/.env.sample` | `openvpn/.env` (used by `post_exec.sh`) |
 | `ssh_key_git/.env.sample` | `ssh_key_git/.env` (git identity for `setup_ssh.sh`) |
 
-**homepage** uses its own variable syntax: `services.yaml`, `settings.yaml` and `bookmarks.yaml`
-contain `{{HOMEPAGE_VAR_...}}` placeholders, filled from `homepage/.env` (passed to the container
+**homepage** configuration is not included (it describes your own services): put your YAML files in
+`homepage/config/` (gitignored). Use `{{HOMEPAGE_VAR_...}}` placeholders for passwords and API keys, filled from `homepage/.env` (passed to the container
 with `env_file`). Values that start with `{{` must be quoted in YAML.
 
 `install_containers.sh` starts with a `check_secrets` step: it stops with a list of what is

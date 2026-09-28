@@ -6,7 +6,7 @@ services:
     network_mode: host
     environment:
       - GLANCES_OPT=-w
-      - DOCKER_HOST=tcp://127.0.0.1:2375   # docker del .30 in sola lettura (docker-socket-proxy)
+      - DOCKER_HOST=tcp://127.0.0.1:2375   # docker dell host in sola lettura (docker-socket-proxy)
     pid: "host"
     volumes:
       - /mnt/external_drive/glances:/glances/conf

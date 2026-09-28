@@ -5,7 +5,7 @@ services:
     restart: unless-stopped # senza, dopo un aggiornamento di watchtower o un riavvio resta fermo
     environment:
       # DOZZLE_REMOTE_AGENT: 192.168.1.101:7007   # opzionale: agent Dozzle su un altro host
-      DOCKER_HOST: tcp://docker-socket-proxy:2375 # docker del .30 in sola lettura
+      DOCKER_HOST: tcp://docker-socket-proxy:2375 # docker dell host in sola lettura
     volumes:
       - /mnt/external_drive/dozzle_data:/data
     ports:

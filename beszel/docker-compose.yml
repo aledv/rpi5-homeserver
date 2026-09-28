@@ -36,7 +36,7 @@ services:
       - /mnt/external_drive:/extra-filesystems/external_drive__External drive:ro
     environment:
       LISTEN: /beszel_socket/beszel.sock
-      DOCKER_HOST: tcp://127.0.0.1:2375   # metriche per-container, docker del .30 in sola lettura (docker-socket-proxy)
+      DOCKER_HOST: tcp://127.0.0.1:2375   # metriche per-container, docker dell host in sola lettura (docker-socket-proxy)
       HUB_URL: http://localhost:8089
       TOKEN: ${TOKEN}
       KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBqM2bNpoEXL4PYjmmIqk/J4Zp0mNasobquCPJ7kzYf"

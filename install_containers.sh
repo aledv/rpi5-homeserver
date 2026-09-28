@@ -287,5 +287,5 @@ for dir in "$main_folder"/*; do
     fi
 done
 
-# Nomi locali di Pi-hole (xxx.example.com -> .30 da casa/VPN): pihole/local_dns_hosts.txt
+# Nomi locali di Pi-hole (xxx.example.com -> server da casa/VPN): pihole/local_dns_hosts.txt
 ./pihole/apply_local_dns.sh
