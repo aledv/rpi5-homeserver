@@ -10,6 +10,7 @@
 192.168.1.100 homepage.example.com
 192.168.1.100 nginx.example.com
 192.168.1.100 openvpn.example.com
+192.168.1.100 paperless.example.com
 192.168.1.100 photoprism.example.com
 192.168.1.100 pihole.example.com
 192.168.1.100 plex.example.com

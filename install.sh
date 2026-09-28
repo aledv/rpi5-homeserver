@@ -209,6 +209,13 @@ install_crowdsec_bouncer() {
     sudo systemctl restart crowdsec-firewall-bouncer || true
 }
 
+# Funzione per limitare sshd (SSH solo da LAN/VPN: la porta 22 non va inoltrata sul router)
+configure_sshd_hardening() {
+    echo "Configurazione di sshd (root no, 3 tentativi, solo pi)..."
+    sudo install -m 644 scripts/sshd_hardening.conf /etc/ssh/sshd_config.d/90-hardening.conf
+    sudo sshd -t && sudo systemctl reload ssh
+}
+
 # Esegui l'installazione di Docker, se non è già installato
 if ! command -v docker &> /dev/null; then
     install_docker
@@ -292,6 +299,9 @@ configure_docker_stop_timeout
 
 # Bouncer di CrowdSec (firewall): configurazione e riavvio automatico
 install_crowdsec_bouncer
+
+# sshd: root no, massimo 3 tentativi, solo l utente pi
+configure_sshd_hardening
 
 echo "Configuro la eth0"
 sudo sh scripts/configure_eth0.sh

@@ -13,7 +13,7 @@ usernames are read from local `.env` files that are excluded from git
 - **apcupsd** / **apcupsd-cgi**: APC UPS monitoring daemon and its web interface.
 - **beszel**: lightweight server monitoring (hub + agent).
 - **code-server**: VS Code in the browser.
-- **crowdsec**: collaborative intrusion prevention: reads the Nginx Proxy Manager and SSH logs and bans attacking IPs on the host firewall (`crowdsec-firewall-bouncer`, installed by `install.sh`); LAN/VPN and your home IP are never banned (`scripts/crowdsec_allow_myip.sh`).
+- **crowdsec**: collaborative intrusion prevention: reads the Nginx Proxy Manager, SSH and mail server (Postfix/Dovecot) logs and bans attacking IPs on the host firewall (`crowdsec-firewall-bouncer`, installed by `install.sh`); LAN/VPN and your home IP are never banned (`scripts/crowdsec_allow_myip.sh`).
 - **ddclient**: dynamic DNS client that keeps your domain pointing to your public IP.
 - **docker-socket-proxy**: read-only Docker API for the monitoring containers (homepage, Uptime Kuma, Dozzle, Glances, Beszel), so none of them mounts `/var/run/docker.sock`.
 - **dozzle**: real-time Docker log viewer (supports remote agents).
@@ -28,6 +28,7 @@ usernames are read from local `.env` files that are excluded from git
 - **onlyoffice**: online document editor, integrated with Nextcloud.
 - **openvpn** / **wireguard**: VPN servers for remote access.
 - **oracle-xe**: Oracle Database 23ai Free.
+- **paperless** (+ PostgreSQL, Valkey, Tika, Gotenberg): document archive with OCR, full-text search and optional AI features (title/tag suggestions, document chat, semantic search) through an Ollama server on your LAN (`OLLAMA_URL`, e.g. `qwen3:4b-instruct` + `bge-m3` on a CPU-only mini PC). Drop files in `/mnt/external_drive/paperless/consume` (subfolders become tags).
 - **photoprism** (+ MariaDB): AI-powered photo management.
 - **pihole**: network-wide ad blocker and local DNS (local records kept in `pihole/local_dns_hosts.txt`, applied by `pihole/apply_local_dns.sh`).
 - **plex**: media server.
@@ -122,6 +123,7 @@ config files above does not exist. Keep a copy of your `.env` files outside the 
 - gives Docker 240 s to stop containers at shutdown (clean Oracle/MariaDB shutdown)
 - installs the crontab, `/etc/fstab` entries and Docker `daemon.json` from `scripts/`
 - installs rsyslog and the CrowdSec firewall bouncer (nftables, auto-restart)
+- hardens sshd (`scripts/sshd_hardening.conf`: no root login, 3 attempts, only `pi`); keep SSH reachable only from LAN/VPN
 - configures the git SSH key and identity (`ssh_key_git/`)
 
 `install_containers.sh`
@@ -133,7 +135,7 @@ config files above does not exist. Keep a copy of your `.env` files outside the 
 
 The nightly `scripts/daily_backup.sh` (root crontab, 02:00) rescans Nextcloud, runs `apt full-upgrade` (and sends a
 dedicated message when a reboot is needed), indexes PhotoPrism, refreshes Plex and rsyncs the DAS to a backup server;
-its log is kept for 14 days in `/mnt/external_drive/utility/logs/`.
+its log is kept for 14 days in `/mnt/external_drive/utility/logs/`. With `KUMA_PUSH_URL` set it also reports success/failure to an Uptime Kuma push monitor, so a missing backup raises an alert.
 
 ## Notes
 

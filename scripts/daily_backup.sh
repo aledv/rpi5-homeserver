@@ -1,6 +1,6 @@
 #!/bin/bash
 # Backup notturno di rpi5 (lanciato dal crontab di root alle 02:00 (spostato dalle 00:00 il 26/09/2026 per non sovrapporsi ai report automatici di Oracle)).
-# Segreti e parametri (PLEX_TOKEN, NEXTCLOUD_USER, BACKUP_TARGET) da .env nella stessa cartella, escluso da git: vedi scripts/.env.sample
+# Segreti e parametri (PLEX_TOKEN, NEXTCLOUD_USER, BACKUP_TARGET, KUMA_PUSH_URL) da .env nella stessa cartella, escluso da git: vedi scripts/.env.sample
 # Codice di uscita: 0 = tutto ok · 1 = backup ok ma qualche passo di manutenzione è fallito · altro = rsync fallito (codice di rsync)
 [ -f "$(dirname "$0")/.env" ] && . "$(dirname "$0")/.env"
 
@@ -62,6 +62,12 @@ esac
 
 echo; echo "=== RIEPILOGO"
 printf '%s\n' "${SUMMARY[@]}"
+
+# Uptime Kuma (monitor push "daily-backup"): up se il backup rsync è andato, down altrimenti; senza push per 26 ore Kuma avvisa
+if [ -n "${KUMA_PUSH_URL:-}" ]; then
+    [ $RSYNC_RC -eq 0 ] && KUMA_STATUS=up || KUMA_STATUS=down
+    curl -fsS -m 10 -G "$KUMA_PUSH_URL" --data-urlencode "status=$KUMA_STATUS" --data-urlencode "msg=rsync $RSYNC_RC, manutenzione $([ $MAINT_FAILED -eq 0 ] && echo ok || echo con errori)" >/dev/null || echo "Push a Uptime Kuma non riuscito"
+fi
 
 if [ $RSYNC_RC -ne 0 ]; then exit $RSYNC_RC; fi
 if [ $MAINT_FAILED -ne 0 ]; then exit 1; fi

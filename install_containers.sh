@@ -42,6 +42,10 @@ copy_files() {
     echo "Copia dei file richiesti..."
 
 
+    # Paperless-ngx: cartelle dati; consume scrivibile da pi (uid 1000, USERMAP_UID del container)
+    sudo mkdir -p /mnt/external_drive/paperless/{data,media,export,consume,pgdata,redis}
+    sudo chown 1000:1000 /mnt/external_drive/paperless/consume
+
     # Copia ddclient.conf sotto /mnt/external_drive/ddclient
     if [ -f "ddclient/ddclient.conf" ]; then
         sudo mkdir -p /mnt/external_drive/ddclient && sudo cp "ddclient/ddclient.conf" /mnt/external_drive/ddclient

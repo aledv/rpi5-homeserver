@@ -16,8 +16,14 @@ filenames:
 labels:
   type: nginx
 ---
-# SSH dell host (porta 22 aperta su internet): /var/log/auth.log scritto da rsyslog (installato da install.sh)
+# SSH dell host (anche se raggiungibile solo da LAN/VPN): /var/log/auth.log scritto da rsyslog (installato da install.sh)
 filenames:
   - /var/log/host/auth.log
+labels:
+  type: syslog
+---
+# Mailserver (Postfix + Dovecot, docker-mailserver): tentativi di login e abusi SMTP/IMAP
+filenames:
+  - /var/log/mail/mail.log
 labels:
   type: syslog

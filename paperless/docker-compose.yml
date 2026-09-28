@@ -1,0 +1,95 @@
+# Paperless-ngx: archivio dei documenti con OCR (ita+eng), ricerca nel testo e classificazione automatica.
+# URL: https://paperless.example.com (NPM, ACL "LAN & VPN Only") oppure http://<ip-del-pi>:8010
+# AI (Paperless >= 3): suggerimenti di titolo/tag/mittente, chat sui documenti e ricerca per significato
+# tramite un server Ollama in LAN (OLLAMA_URL, es. http://192.168.1.101:11434; modelli qwen3:4b-instruct + bge-m3):
+# i documenti non escono di casa. Per non usare l'AI: PAPERLESS_AI_ENABLED=false.
+# Tika + Gotenberg servono per i file Office (doc/docx/xls/xlsx/odt). Segreti in .env (vedi .env.sample).
+# Per importare: copiare i file in /mnt/external_drive/paperless/consume (le sottocartelle diventano tag; i file vengono spostati nell'archivio).
+services:
+  paperless-broker:
+    image: docker.io/valkey/valkey:9-alpine
+    container_name: paperless-broker
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/paperless/redis:/data
+    mem_limit: 128m
+
+  paperless-db:
+    image: docker.io/library/postgres:18
+    container_name: paperless-db
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/paperless/pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD}
+    stop_grace_period: 60s
+    mem_limit: 512m
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.2.1
+    container_name: paperless
+    restart: unless-stopped
+    depends_on:
+      - paperless-db
+      - paperless-broker
+      - paperless-gotenberg
+      - paperless-tika
+    ports:
+      - "8010:8000"
+    volumes:
+      - /mnt/external_drive/paperless/data:/usr/src/paperless/data
+      - /mnt/external_drive/paperless/media:/usr/src/paperless/media
+      - /mnt/external_drive/paperless/export:/usr/src/paperless/export
+      - /mnt/external_drive/paperless/consume:/usr/src/paperless/consume
+    environment:
+      USERMAP_UID: 1000
+      USERMAP_GID: 1000
+      PAPERLESS_URL: https://paperless.${DOMAIN}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
+      PAPERLESS_TIME_ZONE: Europe/Rome
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://paperless-gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://paperless-tika:9998
+      PAPERLESS_OCR_LANGUAGE: ita+eng
+      PAPERLESS_OCR_MODE: auto                  # OCR solo se il PDF non ha già il testo
+      PAPERLESS_TASK_WORKERS: 1                 # Raspberry: un documento alla volta
+      PAPERLESS_THREADS_PER_WORKER: 2
+      PAPERLESS_WEBSERVER_WORKERS: 1
+      PAPERLESS_CONSUMER_RECURSIVE: "true"
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_CONSUMER_POLLING_INTERVAL: 60   # /mnt/external_drive (USB): polling invece di inotify
+      # AI tramite Ollama (altro host in LAN, anche solo CPU)
+      PAPERLESS_AI_ENABLED: "true"
+      PAPERLESS_AI_LLM_BACKEND: ollama
+      PAPERLESS_AI_LLM_ENDPOINT: ${OLLAMA_URL}
+      PAPERLESS_AI_LLM_MODEL: qwen3:4b-instruct
+      PAPERLESS_AI_LLM_EMBEDDING_BACKEND: ollama
+      PAPERLESS_AI_LLM_EMBEDDING_MODEL: bge-m3
+      PAPERLESS_AI_LLM_REQUEST_TIMEOUT: 300     # CPU senza GPU: risposte lente
+      PAPERLESS_AI_LLM_OUTPUT_LANGUAGE: it
+      PAPERLESS_LLM_INDEX_TASK_CRON: "30 3 * * *"   # embedding di notte, dopo il backup delle 02:00
+    mem_limit: 2g
+
+  paperless-gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.37
+    container_name: paperless-gotenberg
+    restart: unless-stopped
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    mem_limit: 768m
+
+  paperless-tika:
+    image: docker.io/apache/tika:3.3.1.0
+    container_name: paperless-tika
+    restart: unless-stopped
+    mem_limit: 768m
