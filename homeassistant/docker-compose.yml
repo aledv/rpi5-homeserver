@@ -1,0 +1,23 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8123/manifest.json >/dev/null"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    image: ghcr.io/home-assistant/home-assistant:2026.10.4@sha256:23f4dfbb69ce76315dbc4de7915504f1c2dcecd7ca2648113a493a385972e133  # aggiornata in automatico il 25/10/2026 (era 2026.10.3@407b89cd11a8…)
+    restart: unless-stopped
+    network_mode: host
+    # 27/09: al posto di privileged, solo cio che serve:
+    # chiavetta Zigbee ConBee II per ZHA (la configurazione di ZHA usa /dev/ttyACM0) e Bluetooth dell host via D-Bus
+    cap_add:            # gestione dell adattatore Bluetooth (richiesto da Home Assistant)
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2464430-if00:/dev/ttyACM0
+    volumes:
+      - /mnt/external_drive/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro

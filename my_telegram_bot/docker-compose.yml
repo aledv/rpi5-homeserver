@@ -1,0 +1,34 @@
+# Personal Telegram assistant (music into Plex, documents into Nextcloud, calendar reminders, torrent imports).
+# PRIVATE image: listed so this repository matches the real server 1:1, but it cannot be pulled by others.
+# .env and secrets/ (Google service account key) in /mnt/external_drive/my-telegram-bot, outside git.
+services:
+  my-telegram-bot:
+    image: ghcr.io/aledv/my_telegram_bot:72e4e3c@sha256:ed3cfcbf35ac75b50de41d3e3a2aac64cccb8ae688cb0f5d5d76ae1a4b04d56b
+    container_name: my-telegram-bot
+    restart: unless-stopped
+    # www-data: files saved into Nextcloud folders stay manageable by Nextcloud
+    user: "33:33"
+    env_file: /mnt/external_drive/my-telegram-bot/.env
+    environment:
+      # documents and photos received on Telegram go to Nextcloud (Telegram folder); the cron job
+      # scanner_nextcloud_rescan.sh sees the flag and rescans
+      - NEXTCLOUD_DOCS_DIR=/nextcloud/Telegram
+      - NEXTCLOUD_RESCAN_FLAG=/state/nextcloud-rescan
+    volumes:
+      - /mnt/external_drive/Music:/mnt/external_drive/Music
+      - /mnt/external_drive/Movies:/mnt/external_drive/Movies
+      - /mnt/external_drive/SerieTV:/mnt/external_drive/SerieTV
+      # magnet downloads: Transmission saves here, the bot imports them (then Transmission removes them)
+      - /mnt/external_drive/downloads/bot:/downloads/bot:ro
+      # Nextcloud Telegram folder (documents received by the bot)
+      - /mnt/external_drive/nextcloud/nextcloud_data/data/${NEXTCLOUD_USER}/files/Telegram:/nextcloud/Telegram
+      # downloads in progress tracked by the bot
+      - /mnt/external_drive/bott_state:/state
+      # Google service account key for the calendar reminders
+      - /mnt/external_drive/my-telegram-bot/secrets:/secrets:ro
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

@@ -1,0 +1,70 @@
+services:
+  nextcloud:
+    image: nextcloud:35@sha256:89af7ee7a96ff5e9668280566209268ae6b2d02327f6ef6d56f6d68228cf9431  # aggiornata in automatico il 24/10/2026 (era 35@301e07b7f661…)
+    container_name: nextcloud
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "curl -fsS http://localhost/status.php | grep -q installed.:true"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    ports:
+      - "6789:80"
+    volumes:
+      - /mnt/external_drive/nextcloud/nextcloud_data:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - REDIS_HOST=redis  # Aggiungi la configurazione per Redis
+    depends_on:
+      - db
+      - redis  # Assicurati che Redis sia avviato prima di Nextcloud
+    networks:
+      - network
+
+  db:
+    image: mariadb:11.8.9@sha256:6a4b3c20cffebc8b2d9248924f6a63285176c15a532b8e4840b8804e1c2c0443  # aggiornata in automatico il 27/10/2026 (era 11.8.9@f16d7a344413…)
+    # 29/09/2026: niente binlog (nessuna replica; crescevano senza limite), slow query log e redo log 128 MB (controlli di Nextcloud); 13/10/2026: buffer pool 1 GB (era 128 MB); 25/10/2026: tabelle temporanee in memoria fino a 64 MB (29% finivano su disco)
+    command: --transaction-isolation=READ-COMMITTED --skip-log-bin --slow-query-log=1 --long-query-time=2 --innodb-log-file-size=128M --innodb-buffer-pool-size=1G --tmp-table-size=64M --max-heap-table-size=64M
+    container_name: nextcloud_db
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/nextcloud/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    mem_limit: 2g
+    networks:
+      - network
+
+  redis:
+    image: redis:8@sha256:0a014ae5c04f55c82aaad2314de411c7a203de1c4312c3e526939226a0185dd9  # aggiornata in automatico il 27/10/2026 (era 8@97ec88159e6d…)
+    container_name: nextcloud_redis
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/nextcloud/redis_data:/data
+    expose:
+      - "6379"  # Esponi la porta 6379 per la comunicazione con Nextcloud
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

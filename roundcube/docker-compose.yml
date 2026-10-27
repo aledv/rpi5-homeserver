@@ -1,0 +1,28 @@
+services:
+  roundcube:
+    image: roundcube/roundcubemail:1.7.5-apache@sha256:9d19d988694b14770aab4899c31c61a2212df947c113a40915e13c026354e88b  # aggiornata in automatico il 27/10/2026 (era 1.7.5-apache@dfe7e05eccab…)
+    container_name: roundcube
+    environment:
+      # database: SQLite in /var/roundcube/db (predefinito). 13/10/2026: tolto il MariaDB, mai usato (variabili ROUNDCUBE_DB_* ignorate)
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://mailserver.${DOMAIN}
+      - ROUNDCUBEMAIL_DEFAULT_PORT=993
+      - ROUNDCUBEMAIL_SMTP_SERVER=tls://mailserver.${DOMAIN}
+      - ROUNDCUBEMAIL_SMTP_PORT=587
+      # 2FA con codice da app (27/09): ogni utente la attiva da Impostazioni > 2-Factor Authentication
+      - ROUNDCUBEMAIL_COMPOSER_PLUGINS=alexandregz/twofactor_gauthenticator:dev-master
+      - ROUNDCUBEMAIL_PLUGINS=archive,zipdownload,twofactor_gauthenticator
+    ports:
+      - "1122:80"  # Porta per accedere all'interfaccia web di Roundcube
+    volumes:
+      #- /mnt/external_drive/roundcube/data:/var/www/html
+      - /mnt/external_drive/roundcube/db:/var/roundcube/db
+      # configurazione della 2FA: copiata nel plugin dopo il composer install (quella del plugin è di esempio: solo @tereborace.com e LAN esclusa)
+      - ./twofactor_gauthenticator.config.inc.php:/opt/twofactor_gauthenticator.config.inc.php:ro
+      - ./twofactor_post_setup.sh:/entrypoint-tasks/post-setup/10-twofactor-config.sh:ro
+    restart: always
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

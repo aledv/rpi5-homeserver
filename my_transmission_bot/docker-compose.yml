@@ -1,0 +1,15 @@
+# Telegram bot for Transmission (public repo aledv/transmission-telegram-bot).
+# config.json (secrets) and user-notification.json in /mnt/external_drive/my-transmission-bot, outside git and the image.
+services:
+  my-transmission-bot:
+    image: ghcr.io/aledv/transmission-telegram-bot:a78daee@sha256:f0849b3988fc5ab6b3b7d45f532d863e542b45c8ad33bbf649b8d9ab8ba4ef8d
+    container_name: my-transmission-bot
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/my-transmission-bot:/config
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

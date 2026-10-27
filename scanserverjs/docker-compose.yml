@@ -1,0 +1,20 @@
+services:
+  scanservjs:
+    image: sbs20/scanservjs:v3.3.0@sha256:7a0c0dfd546f483c2fe8c5ccdcd8fc96301a41fb0d4309747fc8268108defb6a  # fissata il 29/09/2026 (era sbs20/scanservjs:latest)
+    container_name: scanservjs
+    restart: unless-stopped
+    ports:
+      - "8383:8080"  # Mappa la porta 8383 della macchina locale alla porta 8080 del container
+    volumes:
+      - /var/run/dbus:/var/run/dbus  # Monta il volume di dbus per la comunicazione
+      - /mnt/external_drive/scanservjs/scans:/var/lib/scanservjs/output
+      - /mnt/external_drive/scanservjs/cfg:/etc/scanservjs
+    # 01/10: lo scanner USB lo tiene scanner-buttons (scanbd, tasti fisici) e lo presta a scanservjs via saned
+    environment:
+      SANED_NET_HOSTS: scanner-buttons
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true     

@@ -1,0 +1,19 @@
+# Ring alarm in Home Assistant through MQTT (replaced homebridge-ring).
+# First start: Ring login (e-mail, password, 2FA) on the web page http://<host>:55123 (LAN only); the token is saved in
+# /mnt/external_drive/ring-mqtt/data/ring-state.json. Settings: ring-mqtt/config.json from this repo, copied to
+# data/config.json (no secrets). No Ring cameras: RTSP off (8554 belongs to mediamtx).
+services:
+  ring-mqtt:
+    image: tsightler/ring-mqtt:5.9.3@sha256:4a4e0db460d7023aa5851ff25491401fd23b2fd153b7269af481f0953cd6f00a  # pinned 2026-10-25
+    container_name: ring-mqtt
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Rome
+    ports:
+      - "192.168.1.100:55123:55123"  # Ring login page, LAN only
+    volumes:
+      - /mnt/external_drive/ring-mqtt/data:/data
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"

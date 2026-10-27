@@ -1,0 +1,38 @@
+# Camera dashboard (public repo aledv/yi-hack-cam-dashboard) + MediaMTX for the live streams.
+# Data in /mnt/external_drive/camera_dashboard (.env, config.yml, data/, mediamtx/mediamtx.yml), outside git.
+# The cameras upload their clips via FTP (pure-ftpd) to /mnt/external_drive/pure-ftpd/data/test; clips older than
+# 7 days are removed by scripts/cleanup_camera_recordings.sh.
+services:
+  camera-app:
+    image: ghcr.io/aledv/yi-hack-cam-dashboard:f0a0298@sha256:3d0addb01b708252db2ce333ca418623b556fc1353f8468a2c8662e5eba47632
+    container_name: camera-app
+    restart: unless-stopped
+    env_file:
+      - /mnt/external_drive/camera_dashboard/.env
+    volumes:
+      - /mnt/external_drive/camera_dashboard/config.yml:/app/config.yml:ro
+      - /mnt/external_drive/camera_dashboard/data:/app/data                 # sqlite index + thumbnails
+      - /mnt/external_drive/pure-ftpd/data/test:/recordings:ro              # recordings, one folder per camera
+    ports:
+      - "8055:8000"
+    depends_on:
+      - mediamtx
+    networks:
+      - shared_network
+
+  mediamtx:
+    image: bluenviron/mediamtx:1.21.3@sha256:59e43552f3be43695b70c19424dc2a42fcec18075f88d91561a24ac5d70a586c  # aggiornata in automatico il 26/10/2026 (era 1.21.2@c7540465f868…)
+    container_name: mediamtx
+    restart: unless-stopped
+    volumes:
+      - /mnt/external_drive/camera_dashboard/mediamtx/mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "8888:8888"   # HLS
+      - "8889:8889"   # WebRTC
+      - "8554:8554"   # RTSP
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

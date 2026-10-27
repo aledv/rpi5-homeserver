@@ -1,0 +1,45 @@
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest@sha256:e69d1a7932e9dab0fc523edc7be1f3a53f3c261f57856fc2167ae74a8fc022e8  # aggiornata in automatico il 24/10/2026 (era postgresql-latest@85909afc45bd…)
+    container_name: umami
+    ports:
+      - "3004:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_TYPE: postgresql
+      APP_SECRET: ${APP_SECRET} 
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f https://umami.${DOMAIN}/api/heartbeat || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s      
+
+  db:
+    image: postgres:15-alpine@sha256:54e0dd8e8cddcdbb9156c2486eed5a43eccb7214d7c6828097d41ce049fb3984  # aggiornata in automatico il 27/10/2026 (era 15-alpine@a8e042598834…)
+    container_name: umami-db
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
+    volumes:
+      - /mnt/external_drive/umami/db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

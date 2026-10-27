@@ -1,0 +1,32 @@
+services:
+  pihole:
+    image: pihole/pihole:2026.10.0@sha256:d34134716fc32038b052a8674c7c6879e0ff21f0e6d8af345166fffa2c27c113  # aggiornata in automatico il 18/10/2026 (era 2026.09.0@5b9c8cf51de7…)
+    container_name: pihole
+    #network_mode: "host" # Necessario per Pi-hole per gestire le richieste DNS
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "4080:80/tcp"
+    environment:
+      TZ: "Europe/Rome" # Imposta il fuso orario
+      # Impostazioni fissate qui (FTLCONF_*): una reinstallazione le ricrea uguali; nell interfaccia web diventano di sola lettura (21/10/2026)
+      FTLCONF_dns_upstreams: "9.9.9.9;149.112.112.112;1.1.1.1;1.0.0.1"  # Quad9 (blocca domini malevoli) + Cloudflare; prima 18 server di 7 provider
+      FTLCONF_dns_dnssec: "true"
+      FTLCONF_dns_domainNeeded: "true"      # i nomi senza punto non escono verso internet
+      FTLCONF_ntp_ipv4_active: "false"      # niente server/client NTP in Pi-hole: il Pi si sincronizza da sé
+      FTLCONF_ntp_ipv6_active: "false"
+      FTLCONF_ntp_sync_active: "false"
+      FTLCONF_misc_nice: "-999"             # non cambiare la priorità (servirebbe CAP_SYS_NICE)
+      WEBPASSWORD: ${WEBPASSWORD} # Password per accedere all'interfaccia web di Pi-hole
+    volumes:
+      - "/mnt/external_drive/pihole/etc-pihole:/etc/pihole"
+      - "/mnt/external_drive/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true  

@@ -1,0 +1,12 @@
+// Aggiornamenti automatici del RPi4 rpi-backup (dal 20/10/2026), come DELL e .30: oltre a Debian e sicurezza (50unattended-upgrades)
+// anche Debian updates, Raspberry Pi (kernel, firmware) e Docker. Installato da rpi-backup/install.sh in /etc/apt/apt.conf.d/.
+// Gli aggiornamenti girano verso le 06:00-07:00 (apt-daily-upgrade.timer); se serve un riavvio lo fa alle 05:00 del giorno dopo,
+// dopo il backup offsite delle 03:30 e prima della pulizia della domenica alle 06:00.
+Unattended-Upgrade::Origins-Pattern {
+        "origin=Debian,codename=${distro_codename}-updates";
+        "origin=Raspberry Pi Foundation,codename=${distro_codename}";
+        "origin=Docker,label=Docker CE";
+};
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "05:00";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";

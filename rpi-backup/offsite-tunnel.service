@@ -1,0 +1,17 @@
+# Tunnel inverso verso il Pi (.30): espone il rest-server di questo RPi4 su 172.20.0.1:18000 del .30, dove lo usa Backrest.
+# Porte: 18000 rest-server, 17007 agent Dozzle, 19001 agent Portainer (dal 19/10/2026), 127.0.0.1:10022 SSH di manutenzione (dal 20/10/2026: ssh -J pi@192.168.1.100 -p 10022 pi@127.0.0.1). Utente "offsite" sul .30: solo queste porte (my_rpi_scripts/scripts/sshd_hardening.conf). Passa dalla VPN WireGuard: 172.102.0.1 è il .30 visto dal container wg-easy (unico indirizzo in AllowedIPs, vedi wg0.conf).
+# Installato da install.sh in /etc/systemd/system/; si riconnette da solo (rete giù, VPN ricollegata, riavvio del .30).
+[Unit]
+Description=Tunnel inverso rest-server -> Pi .30 (backup offsite)
+After=network-online.target docker.service wg-quick@wg0.service
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ssh -i /root/.ssh/id_offsite -N -o BatchMode=yes -o ExitOnForwardFailure=yes \
+    -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new \
+    -R 172.20.0.1:18000:localhost:8000 -R 172.20.0.1:17007:localhost:7007 -R 172.20.0.1:19001:localhost:9001 -R 127.0.0.1:10022:localhost:22 offsite@172.102.0.1
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

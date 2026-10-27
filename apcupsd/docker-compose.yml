@@ -1,0 +1,74 @@
+# apcupsd sul Pi (.30): UPS APC Back-UPS CS 350 via USB, alimenta il Pi e il DAS. Dashboard: apcupsd-cgi su :3552 (ups.example.com).
+# Spegnimento pulito del Pi (28/09/2026) — la prima condizione che si verifica:
+#   quando restano 10 minuti di autonomia (MINUTES). Regola dell utente del 2026-10-03: conta solo l autonomia residua,
+#   non il tempo trascorso a batteria (TIMEOUT=0); la carica al 10% resta solo come rete di sicurezza.
+#   Il container lo chiede a systemd-logind dell'host via D-Bus (/etc/apcupsd/doshutdown); Docker ha 240 s per fermare i container.
+#   L'UPS NON viene spento (niente killpower): al ritorno della corrente il Pi riparte da solo.
+# ups-notify: avvisi Telegram + email (notifier) a ogni cambio di stato, con coda se il notifier non risponde.
+services:
+  apcupsd:
+    image: gregewing/apcupsd:latest@sha256:cc256387ccac15b46788de3a3b219758ea957f2b85a99b114d0293ac3130e29c  # fissata il 29/09/2026 (era gregewing/apcupsd:latest)
+    container_name: apcupsd
+    devices:
+      - /dev/usb/hiddev0 # Dispositivo per la connessione APC UPS
+      - /dev/hidraw0
+    ports:
+      - 3551:3551
+    environment:
+      - UPSNAME=ACP-350 # Nome del tuo UPS
+      - UPSCABLE=usb # Cavo USB per la connessione
+      - UPSTYPE=usb # Tipo di connessione
+      - DEVICE= # Dispositivo USB (vuoto per il rilevamento automatico)
+      - ONBATTERYDELAY=6
+      - BATTERYLEVEL=10     # solo rete di sicurezza: la regola è l autonomia residua
+      - MINUTES=10          # spegne con 10 min di autonomia residua (Docker ha bisogno fino a 4 min)
+      - TIMEOUT=0           # nessuno spegnimento a tempo: conta solo l autonomia residua
+      - NETSERVER=on # Abilita il servizio di rete per il monitoraggio remoto
+      - NISIP=0.0.0.0 # Ascolta su tutte le interfacce
+      - TZ=Europe/Rome # Imposta il fuso orario
+    volumes:
+      #- /mnt/external_drive/apcupsd:/etc/apcupsd
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    privileged: true # Abilita i permessi avanzati per lo shutdown
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+  apcupsd-cgi:
+    image: bnhf/apcupsd-cgi:latest@sha256:e8733930739719aca608fd97aecfb0aa5f53aaf7681bf4bbccd49dbf67132bf8  # fissata il 29/09/2026 (era bnhf/apcupsd-cgi:latest)
+    container_name: apcupsd-cgi
+    dns_search: localdomain # Dominio locale per la risoluzione DNS
+    ports:
+      - 3552:80
+    environment:
+      - UPSHOSTS=apcupsd # Nome del container apcupsd
+      - UPSNAMES=ACP-350 # Nome del tuo UPS da visualizzare
+      - TZ=Europe/Rome # Fuso orario per l'interfaccia web
+    #volumes:
+    #  - /mnt/external_drive/apcupsd/etc:/etc/apcupsd
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+  ups-notify:
+    build: ./ups-notify
+    image: ups-notify
+    container_name: ups-notify
+    restart: unless-stopped
+    depends_on:
+      - apcupsd
+    environment:
+      - NIS=apcupsd:3551
+      - NOTIFY_URL=http://notifier_project:5000/notify
+      - NAME=UPS RPi5 (Pi + DAS)
+      - HOST=il Pi
+      - WARN_MIN=15
+      - SHUT_MIN=10
+      - TIMEOUT_MIN=0
+      - TZ=Europe/Rome
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

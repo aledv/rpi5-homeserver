@@ -1,0 +1,13 @@
+[GDrive]
+type = drive
+client_id = 1018034379490-85hf2vrt39ssuqgjlqgfqs3up4kdmteb.apps.googleusercontent.com
+client_secret = <DA_COMPILARE>
+scope = drive
+token = <DA_COMPILARE>
+
+[GPhotos]
+type = google photos
+client_id = 244750491595-o0769qam1n53f5dqehmulh6rjd0d3v46.apps.googleusercontent.com
+client_secret = <DA_COMPILARE>
+token = <DA_COMPILARE>
+

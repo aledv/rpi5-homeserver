@@ -1,0 +1,27 @@
+services:
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:15.5.0@sha256:071f79a639e9361123a5e57733107320207b844ddbbd92dfa6962f541fe8aac8  # aggiornata in automatico il 25/10/2026 (era 15.4.0@0e7bc9d34e86…)
+    container_name: wireguard
+    ports:
+      - 51820:51820/udp
+      - 51821:51821/tcp
+    volumes:
+      - /mnt/external_drive/wireguard/config:/etc/wireguard
+      - /lib/modules:/lib/modules
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    # privileged rimosso il 27/09: bastano NET_ADMIN e SYS_MODULE
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.102.0.0/24

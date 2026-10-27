@@ -1,0 +1,15 @@
+# Personal website: public repo aledv/divanni.me, nginx image ghcr.io/aledv/divanni-me built by GitHub Actions.
+# Published through Nginx Proxy Manager (https://${DOMAIN} -> this host:8989).
+# The Portfolio data (repos.json) is mounted from website-data and refreshed nightly by
+# scripts/divanni_repos_update.py (cron): the folder is mounted, not the file, so the atomic replace is seen at once.
+services:
+  website:
+    image: ghcr.io/aledv/divanni-me:0d708d4@sha256:940c254809a245df4828a4c53f7ac4d786059b016497d6c79d8242c98bedca48
+    container_name: website
+    restart: unless-stopped
+    ports:
+      - "8989:80"
+    volumes:
+      - /mnt/external_drive/website-data:/usr/share/nginx/html/data:ro
+    # not on shared_network: a container named like the domain would make the domain resolve to it
+    # inside the other containers

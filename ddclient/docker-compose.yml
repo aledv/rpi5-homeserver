@@ -1,0 +1,17 @@
+services:
+  ddclient:
+    image: lscr.io/linuxserver/ddclient:v4.0.0-ls233@sha256:61de8a998f00bcf468a361f0df6007fb6ee8b2c6e89ed1c431145a98caeb7755  # fissata il 29/09/2026 (era lscr.io/linuxserver/ddclient:latest)
+    container_name: ddclient
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /mnt/external_drive/ddclient:/config
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true  

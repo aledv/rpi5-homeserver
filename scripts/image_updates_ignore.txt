@@ -1,0 +1,5 @@
+# Aggiornamenti da non segnalare (letto da image_updates_check.py). Formato: <cartella> <immagine> <tipi separati da virgola>
+# Tipi: rebuild, patch, minor, major, reference. Decisioni dell utente del 14/10/2026.
+nextcloud  mariadb   major   # Nextcloud 35 supporta MariaDB fino alla 12.3 (passati a 11.8 LTS il 29/09)
+photoprism mariadb   major   # nessun vantaggio, richiede dump e reimport
+umami      postgres  major   # nessun vantaggio, cambio di major di PostgreSQL = dump e reimport

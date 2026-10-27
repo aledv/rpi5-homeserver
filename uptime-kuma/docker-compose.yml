@@ -1,0 +1,18 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.8@sha256:20abea8c48a163cf0a7a5d5936ab418e4b742d908704e1f58f6c06e56a9c6b67  # aggiornata in automatico il 27/10/2026 (era 2.5.7@4b95dbe7ac53…)
+    container_name: uptime-kuma
+    restart: always
+    dns:
+      - 192.168.1.100
+    ports:
+      - "3001:3001"
+    volumes:
+      - /mnt/external_drive/uptime-kuma:/app/data
+      # docker dell host: host "Docker@RPi5" in Kuma = tcp://docker-socket-proxy:2375 (sola lettura)
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 

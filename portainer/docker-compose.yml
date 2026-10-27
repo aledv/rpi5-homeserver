@@ -1,0 +1,17 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:2.45.3@sha256:3609c307943bca8e5c492f69ddd6965df177208b50678a4cff28391c8dd4e96e  # aggiornata in automatico il 22/10/2026 (era 2.45.2@03f94a406496…)
+    container_name: portainer
+    restart: always
+    ports:
+      - "9443:9443"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/external_drive/portainer:/data
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true 

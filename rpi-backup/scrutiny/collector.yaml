@@ -1,0 +1,5 @@
+# Seagate Expansion 4 TB dietro bridge USB (quirk usb-storage "u" in cmdline.txt) → sat
+version: 1
+devices:
+  - device: /dev/sda
+    type: sat

@@ -1,0 +1,49 @@
+services:
+  app:
+    image: jc21/nginx-proxy-manager:2@sha256:4393e642e233e5efd5adeb7f10918d4aaea71c9ed875b94190273fc8e87f9594  # fissata il 29/09/2026 (era jc21/nginx-proxy-manager:2)
+    container_name: nginx-proxy-manager
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "curl -fsS http://localhost:81/api/ >/dev/null"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      - nginx_db
+    network_mode: host  # Usa la rete dell'host
+    environment:
+      DB_MYSQL_HOST: "127.0.0.1"  # Deve essere 127.0.0.1 perché "db" non è più risolvibile su host
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - /mnt/external_drive/nginx-proxy-manager/data:/data
+      - /mnt/external_drive/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+      
+  nginx_db:
+    image: 'jc21/mariadb-aria:10.11.5'  # fissata il 27/09
+    container_name: nginx-proxy-manager_db
+    healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - /mnt/external_drive/nginx-proxy-manager/mysql:/var/lib/mysql
+    networks:
+      - shared_network
+    ports:
+      - "3306:3306"  # Espone MariaDB sull'host
+
+networks:
+  shared_network:
+    external: true  # La rete deve già esistere

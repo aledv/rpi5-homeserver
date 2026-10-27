@@ -1,0 +1,13 @@
+services:
+  glances:
+    image: nicolargo/glances:4.5.8@sha256:32ccbc559baa624bd41419c9a1daf2c32b391dfbee106434186a52bccd164ac7  # aggiornata in automatico il 14/10/2026 (era v4.5.7@0d955eb3cff5…)
+    container_name: glances
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - GLANCES_OPT=-w
+      - DOCKER_HOST=tcp://127.0.0.1:2375   # docker dell host in sola lettura (docker-socket-proxy)
+    pid: "host"
+    volumes:
+      - /mnt/external_drive/glances:/glances/conf
+      - /mnt/external_drive:/mnt/external_drive:ro

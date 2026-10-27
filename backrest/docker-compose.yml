@@ -1,0 +1,36 @@
+# Backrest (interfaccia web di restic): backup notturno di /mnt/external_drive verso il rest-server del DELL, dal 14/10/2026.
+# Sostituisce lo specchio rsync verso 192.168.1.101::USB_DISK: snapshot cifrati e deduplicati, con storico
+# (14 giornalieri, 8 settimanali, 6 mensili) da sfogliare e ripristinare dall interfaccia.
+# Interfaccia: https://backup.example.com (NPM, solo LAN/VPN) o http://192.168.1.100:9898.
+# Repository: rest:http://192.168.1.101:8000/pi/ (my_dell_scripts/restic-server, disco da 4 TB /mnt/backup).
+# Configurazione (repo, piano, esclusioni, hook): /mnt/external_drive/backrest/config/config.json, generata da setup_config.py
+# a partire dai segreti in .env (RESTIC_PASSWORD = chiave del repository: SENZA NON SI RIPRISTINA NULLA, copia in Vaultwarden).
+# Il piano parte da daily_backup.sh (dopo manutenzione e dump dei database), non da uno schedule interno.
+# /mnt/external_drive è montato in sola lettura; i ripristini vanno in /mnt/external_drive/backrest/restore (da spostare poi a mano).
+services:
+  backrest:
+    image: garethgeorge/backrest:v1.14.1@sha256:b852979754281026230cc69fb11428e6d57c9a97784ab4a444ffc7934c53a215  # fissata il 14/10/2026
+    container_name: backrest
+    hostname: rpi5
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Rome
+      BACKREST_DATA: /data
+      BACKREST_CONFIG: /config/config.json
+      XDG_CACHE_HOME: /cache
+      TMPDIR: /tmp
+    volumes:
+      - /mnt/external_drive/backrest/data:/data
+      - /mnt/external_drive/backrest/config:/config
+      - /mnt/external_drive/backrest/cache:/cache
+      - /mnt/external_drive/backrest/restore:/restore
+      - /mnt/external_drive:/userdata:ro
+    ports:
+      - "9898:9898"
+    mem_limit: 3g
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

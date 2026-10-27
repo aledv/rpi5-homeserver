@@ -1,0 +1,20 @@
+# Notification relay used by every service and script here: POST /notify -> Telegram + e-mail
+# (public repo aledv/notify-relay). Settings in /mnt/external_drive/notifier/.env (see notify-relay's .env.example).
+services:
+  notifier:
+    image: ghcr.io/aledv/notify-relay:98d3c12@sha256:d53b22c1c87ebf044bed817f787fa5c670e73fc9066639ac4a93e25a6e80f79a
+    container_name: notifier_project
+    ports:
+      - "5000:5000"
+    volumes:
+      - /mnt/external_drive/notifier:/logs          # notify.log (the image runs as uid 1000)
+    env_file: /mnt/external_drive/notifier/.env
+    environment:
+      - LOG_FILE=/logs/notify.log
+    restart: always
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

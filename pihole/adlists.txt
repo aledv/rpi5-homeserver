@@ -1,0 +1,5 @@
+# Liste di blocco di Pi-hole (una URL per riga). Applicare con ./apply_adlists.sh (poi aggiorna gravity).
+# 21/10/2026: tolte energized.pro (progetto chiuso, 0 domini) e blocklistproject ads (ferma da luglio); aggiunta HaGeZi Pro.
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt
+https://raw.githubusercontent.com/andyts93/pihole-italian-list/master/adlist.txt

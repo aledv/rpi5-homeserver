@@ -1,0 +1,15 @@
+# segreti locali
+**/.env
+*.bak-*
+*.swp
+# file di configurazione con segreti (usare i .sample)
+ddclient/ddclient.conf
+scripts/rclone.conf
+mailserver/mailserver.env
+ssh_key_git/id_ed25519
+ssh_key_git/id_ed25519.pub
+
+# configurazione personale di homepage (vedi README)
+homepage/config/
+__pycache__/
+scripts/offsite_authorized_keys

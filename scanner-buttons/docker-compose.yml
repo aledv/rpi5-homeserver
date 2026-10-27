@@ -1,0 +1,41 @@
+# Physical scanner buttons (Canon LiDE 100): SCAN -> Paperless, PDF -> Nextcloud/Scansioni, EMAIL -> e-mail, COPY -> print.
+# Public image of aledv/sane-scan-buttons. The scanner is shared with scanservjs through saned
+# (SANED_NET_HOSTS=scanner-buttons in scanserverjs/). Confirmations through the notifier.
+# Needs NEXTCLOUD_USER and PRINTER_QUEUE (CUPS queue name) in scanner-buttons/.env.
+services:
+  scanner-buttons:
+    image: ghcr.io/aledv/sane-scan-buttons:fe93666@sha256:ea55e2dc15717b7831d8455388f297fbe1bcefd047bdad1b447c19ee2b484465
+    container_name: scanner-buttons
+    restart: unless-stopped
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    device_cgroup_rules:
+      - "c 189:* rmw"
+    environment:
+      TZ: Europe/Rome
+      CUPS_SERVER: /run/cups/cups.sock
+      SANE_BACKENDS: genesys
+      SANE_DEVICE_PREFIX: "genesys:"
+      SANED_ALLOW: "172.20.0.0/16,127.0.0.1"   # only the containers on shared_network (scanservjs)
+      LANGUAGE: it
+      FILE_PREFIX: Scansione
+      CONSUME_OWNER: "1000:1000"               # Paperless
+      FOLDER_OWNER: "33:33"                    # Nextcloud's www-data
+      FOLDER_MODE: "640"
+      FOLDER_FLAG: /flags/nextcloud-rescan      # root cron runs occ files:scan (scripts/scanner_nextcloud_rescan.sh)
+      NOTIFY_URL: http://notifier_project:5000
+      EMAIL_SUBJECT: Nuova Scansione
+      EMAIL_SENDER: scanner@example.com
+      EMAIL_SENDER_NAME: Scanner
+      PRINTER: ${PRINTER_QUEUE}
+    volumes:
+      - /run/cups/cups.sock:/run/cups/cups.sock                                   # COPY: print with the host's CUPS queue
+      - /mnt/external_drive/paperless/consume:/consume                                    # SCAN → Paperless
+      - /mnt/external_drive/nextcloud/nextcloud_data/data/${NEXTCLOUD_USER}/files/Scansioni:/output   # PDF → Nextcloud
+      - /mnt/external_drive/scanner-buttons/flags:/flags                                  # flag for the cron job: Nextcloud rescan
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

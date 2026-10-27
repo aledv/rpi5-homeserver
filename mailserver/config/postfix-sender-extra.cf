@@ -1,0 +1,7 @@
+# Mittenti di servizio autorizzati con SPOOF_PROTECTION=1: <mittente> <account che può usarlo>.
+# Non sono alias: non ricevono posta. Per un nuovo servizio aggiungi una riga e riavvia il container.
+notifier@example.com admin@example.com
+monitor@example.com admin@example.com
+speedtest-tracker@example.com admin@example.com
+beszel@example.com admin@example.com
+scrutiny@example.com admin@example.com

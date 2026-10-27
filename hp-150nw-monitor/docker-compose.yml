@@ -1,0 +1,15 @@
+# Toner/status API for the Homepage widget of an HP Color Laser 150nw (public repo aledv/hp-150nw-monitor).
+# http://<this host>:5001/printer/<printer-ip>
+services:
+  hp-150nw-monitor:
+    image: ghcr.io/aledv/hp-150nw-monitor:f8648d3@sha256:5a512b3c5073c49af9b2485662e6b13844c5a5fb2a5ee4b4dcfab4609c9a8abe
+    container_name: hp-150nw-monitor
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

@@ -1,0 +1,82 @@
+# RPi4 "rpi-backup" in un altra sede: copia offsite dei backup del Pi (.30), dal 18/10/2026.
+# - restic-server: riceve da Backrest sul Pi (.30), via VPN, il secondo repository /pi/ (dati cifrati da restic).
+#   Dati sul disco Seagate 4 TB (LABEL=offsite) montato su /mnt/offsite; utente/password in /opt/rpi-backup/htpasswd
+#   (sulla SD, così il server parte anche senza disco: senza disco /mnt/offsite è immutabile e non si scrive sulla SD).
+#   Utente "pi", password = RESTIC_REST_PASSWORD del .env di backrest sul Pi (creato da install.sh).
+# - scrutiny-collector: invia i dati SMART del Seagate all'hub scrutiny sul .30 (host "rpi-backup").
+#   Il bridge USB Seagate 0bc2:331a vuole la quirk usb-storage "u" (niente UAS), impostata da install.sh in cmdline.txt.
+services:
+  restic-server:
+    image: restic/rest-server:0.14.0@sha256:d2aff06f47eb38637dff580c3e6bce4af98f386c396a25d32eb6727ec96214a5  # come sul DELL (14/10/2026)
+    container_name: restic-server
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Rome
+      PASSWORD_FILE: /auth/htpasswd       # fuori da /data: sulla SD
+      OPTIONS: "--private-repos --prometheus --prometheus-no-auth"
+    volumes:
+      - /mnt/offsite:/data
+      - /opt/rpi-backup/htpasswd:/auth/htpasswd:ro
+    ports:
+      - "8000:8000"
+    mem_limit: 512m
+
+  scrutiny-collector:
+    image: ghcr.io/analogj/scrutiny:master-collector@sha256:e0d55d2742017c7025e491e05eb516bc71758c575f7e0bfefe34f9ce13aced89  # come sul DELL (29/09/2026)
+    container_name: scrutiny-collector
+    restart: unless-stopped
+    profiles: ["disco"]   # parte solo con il disco collegato: docker compose --profile disco up -d
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    devices:
+      - /dev/disk/by-id/ata-<MODELLO>_<SERIALE>:/dev/sda   # Seagate Expansion 4 TB
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ./scrutiny:/opt/scrutiny/config:ro
+    environment:
+      COLLECTOR_API_ENDPOINT: http://172.102.0.1:8998   # il .30 attraverso WireGuard
+      COLLECTOR_HOST_ID: rpi-backup
+      COLLECTOR_CRON_SCHEDULE: "0 */6 * * *"
+      COLLECTOR_RUN_STARTUP: "true"
+
+  dozzle-agent:
+    image: amir20/dozzle:v11.3.5@sha256:dd09e6aaa9d5ad686b6017427a502c40dc862ba28445609813e5ea1f66f6dbdf  # come il server dozzle del .30 (25/10/2026)
+    container_name: dozzle-agent
+    command: agent
+    restart: unless-stopped
+    environment:
+      DOZZLE_HOSTNAME: rpi-backup
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:7007:7007"   # solo tunnel inverso: Dozzle sul .30 lo legge da 172.20.0.1:17007
+
+  portainer-agent:
+    image: portainer/agent:2.45.3@sha256:6e6d2d5d8967da5b4d45eab32b7268af170395395d753d3f34ecb4d6ca5bd388  # stessa versione del server Portainer del .30 (23/10/2026)
+    container_name: portainer_agent
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9001:9001"   # solo tunnel inverso: Portainer sul .30 lo raggiunge su 172.20.0.1:19001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /:/host
+
+  beszel-agent:
+    image: henrygd/beszel-agent:0.21.1@sha256:cb6868012964d7a68debaa2c84bb72285e5f08531e81f506bd4c493bf052e41c  # come l hub beszel del .30 (23/10/2026)
+    container_name: beszel-agent
+    restart: unless-stopped
+    profiles: ["beszel"]   # parte solo con .env (BESZEL_TOKEN del sistema rpi-backup nell hub, BESZEL_KEY = chiave pubblica dell hub)
+    network_mode: host
+    volumes:
+      - ./beszel_agent_data:/var/lib/beszel-agent
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/offsite:/extra-filesystems/sda1__Offsite:ro   # disco Seagate del backup offsite
+      - /:/extra-filesystems/mmcblk0p2__SD:ro              # scheda SD (sistema), come disco extra
+    environment:
+      FILESYSTEM: sda1                 # disco principale = Seagate: homepage ne mostra il % (widget beszel, campo disk)
+      LISTEN: 127.0.0.1:45876          # nessuna connessione in ingresso: si collega lui all hub (WebSocket)
+      HUB_URL: http://172.102.0.1:8089 # hub beszel del .30 attraverso WireGuard
+      TOKEN: ${BESZEL_TOKEN:-}
+      KEY: ${BESZEL_KEY:-}

@@ -1,0 +1,44 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+# Backup notturno: log in /mnt/external_drive/utility/logs (uno al giorno, tenuti 14 giorni; daily_backup_latest.txt = ultimo); notifica SOLO in caso di errore (dal 14/10/2026; esito OK nel report del mattino), con allegati gli errori (daily_backup_errors.txt) se ce ne sono
+0 2 * * * flock -n -E 75 /run/lock/daily_backup.lock /bin/bash -c 'L=/mnt/external_drive/utility/logs; mkdir -p $L; F=$L/daily_backup_$(date +\%F).txt; /mnt/external_drive/utility/daily_backup.sh > $F 2>&1; rc=$?; ln -sfn $F $L/daily_backup_latest.txt; find $L -name "daily_backup_2*.txt" -mtime +14 -delete; case $rc in 0) exit 0;; 1) m="Message from RPi5: Backup completato, ma con errori nella manutenzione (dettagli in allegato)";; *) m="Message from RPi5: Backup FALLITO (Backrest, codice $rc)";; esac; E=$L/daily_backup_errors.txt; if [ $rc -ne 0 ] && [ -s $E ]; then curl -s -X POST http://localhost:5000/notify -F "message=$m" -F "file=@$E" >/dev/null; else curl -s -X POST http://localhost:5000/notify -F "message=$m" >/dev/null; fi'; [ $? -eq 75 ] && curl -s -X POST http://localhost:5000/notify -F "message=Message from RPi5: backup notturno saltato, il precedente è ancora in corso" >/dev/null
+0 4 1 * * /bin/bash -c '/mnt/external_drive/utility/renew_cert.sh > /tmp/renew_cert.txt 2>&1 && curl -X POST http://localhost:5000/notify -F "message=Rinnovo certificati per mailserver.example.com eseguito!" -F "file=@/tmp/renew_cert.txt"'
+
+# CrowdSec: tiene l IP pubblico di casa nell allowlist (non va mai bloccato)
+*/5 * * * * /mnt/external_drive/my_rpi_scripts/scripts/crowdsec_allow_myip.sh >> /mnt/external_drive/crowdsec/allow_myip.log 2>&1
+# Registrazioni delle telecamere: tenute solo gli ultimi 7 giorni (03:30, dopo il backup)
+30 3 * * * /mnt/external_drive/utility/cleanup_camera_recordings.sh >> /mnt/external_drive/utility/logs/cleanup_cameras.log 2>&1
+# Scansioni dal tasto PDF dello scanner: riscansione della cartella Nextcloud Scansioni (solo se c è un file nuovo)
+* * * * * /mnt/external_drive/utility/scanner_nextcloud_rescan.sh >/dev/null 2>&1
+# Nextcloud: lavori in background ogni 5 minuti (13/10/2026: prima erano in modalita ajax e giravano solo aprendo il sito)
+*/5 * * * * docker exec -u www-data nextcloud php -f /var/www/html/cron.php >/dev/null 2>&1
+# Aggiornamenti delle immagini Docker fissate (sostituisce Watchtower dal 14/10/2026): risultato in logs/image_updates_latest.json; poi image_updates_apply.py (utente pi) applica quelli sicuri, esito in /mnt/external_drive/image-updates/applied_latest.json; il DELL legge entrambi
+30 7 * * * /mnt/external_drive/my_rpi_scripts/scripts/image_updates_check.py > /mnt/external_drive/utility/logs/image_updates_check.txt 2>&1; mkdir -p /mnt/external_drive/image-updates; chown pi:pi /mnt/external_drive/image-updates; /usr/sbin/runuser -u pi -- /mnt/external_drive/my_rpi_scripts/scripts/image_updates_apply.py > /mnt/external_drive/image-updates/apply.txt 2>&1
+
+# Classificazione AI dei documenti Paperless (16/10/2026): Ollama sul DELL, finestra 04:15-06:30, documenti senza tipo
+# (prima i recenti), tag "AI da verificare"; log solo con id e campi cambiati. Notifica solo se fallisce.
+15 4 * * * /bin/bash -c 'set -a; . /mnt/external_drive/utility/.env; set +a; /mnt/external_drive/my_rpi_scripts/scripts/paperless_ai_classify.sh > /mnt/external_drive/utility/logs/paperless_ai_latest.txt 2>&1 || curl -s -X POST http://localhost:5000/notify -F "message=Message from RPi5: classificazione AI di Paperless fallita (log: utility/logs/paperless_ai_latest.txt)" >/dev/null'
+
+# website: Portfolio data (stars, descriptions, languages) from GitHub every night; notification only on failure
+10 5 * * * /usr/sbin/runuser -u pi -- /mnt/external_drive/my_rpi_scripts/scripts/divanni_repos_update.py > /mnt/external_drive/utility/logs/divanni_repos_latest.txt 2>&1 || curl -s -X POST http://localhost:5000/notify -F "message=Message from RPi5: aggiornamento del Portfolio del sito fallito (log: utility/logs/divanni_repos_latest.txt)" >/dev/null

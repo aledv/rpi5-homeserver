@@ -1,0 +1,43 @@
+# docker-compose per Beszel (hub + agent) sullo stesso host (RPi5)
+# Comunicano via unix socket, quindi nessuna porta extra da esporre in rete
+# per l'agente (solo la 8090 per la web UI dell'hub).
+#
+# Setup:
+#   1. docker compose up -d beszel   (parte solo l'hub per ora)
+#   2. Apri http://<ip-del-pi>:8089, crea l'account admin
+#   3. Vai su Settings > "Add System" (o Tokens) per generare KEY e TOKEN
+#   4. Incolla KEY e TOKEN qui sotto nel servizio beszel-agent
+#   5. docker compose up -d beszel-agent
+
+services:
+  beszel:
+    image: henrygd/beszel:0.21.1@sha256:8514a69d9bbbcb74f371a3205561ee231fc0289739cea64e8131f341d695b770  # aggiornata in automatico il 23/10/2026 (era 0.21.0@6b39a8b64f9b…)
+    container_name: beszel
+    restart: unless-stopped
+    environment:
+      APP_URL: https://beszel.${DOMAIN}   # link corretti nelle email di avviso (prima puntavano a localhost)
+      # Se lo metti dietro nginx-proxy-manager con un dominio, usa quello:
+      # APP_URL: https://beszel.tuodominio.it
+    ports:
+      - 8089:8090
+    volumes:
+      - /mnt/external_drive/beszel/beszel_data:/beszel_data
+      - /mnt/external_drive/beszel/beszel_socket:/beszel_socket
+
+  beszel-agent:
+    image: henrygd/beszel-agent:0.21.1@sha256:cb6868012964d7a68debaa2c84bb72285e5f08531e81f506bd4c493bf052e41c  # aggiornata in automatico il 23/10/2026 (era 0.21.0@f27b1aa2c684…)
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host   # necessario per leggere le statistiche di rete reali dell'host
+    volumes:
+      - /mnt/external_drive/beszel/beszel_agent_data:/var/lib/beszel-agent
+      - /mnt/external_drive/beszel/beszel_socket:/beszel_socket
+      # Per monitorare anche un disco/SSD esterno collegato al Pi, aggiungi es.:
+      - /mnt/external_drive:/extra-filesystems/external_drive__External drive:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      DOCKER_HOST: tcp://127.0.0.1:2375   # metriche per-container, docker dell host in sola lettura (docker-socket-proxy)
+      HUB_URL: http://localhost:8089
+      TOKEN: ${TOKEN}
+      KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICBqM2bNpoEXL4PYjmmIqk/J4Zp0mNasobquCPJ7kzYf"
+      #FILESYSTEM: /dev/nvme0n1p2

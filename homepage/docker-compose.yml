@@ -1,0 +1,20 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v2.7.0@sha256:19c5c09184458a41b7b5915e71463a39f36cd33540f41bdbed008791b8182d5f  # aggiornata in automatico il 24/10/2026 (era v2.6.0@3e38fe788223…)
+    container_name: homepage
+    dns:
+      - 192.168.1.100
+    ports:
+      - 3002:3000
+    volumes:
+      - /mnt/external_drive/homepage:/app/config # Make sure your local config directory exists
+    env_file: .env # HOMEPAGE_VAR_* usate in services.yaml (escluso da git)
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homepage.${DOMAIN} # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+    restart: unless-stopped
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true

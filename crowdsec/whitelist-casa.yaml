@@ -1,0 +1,13 @@
+# Reti che CrowdSec non deve mai segnalare/bloccare
+name: casa/whitelist
+description: "Rete di casa, VPN, reti Docker"
+whitelist:
+  reason: "rete di casa / VPN / docker"
+  cidr:
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "127.0.0.0/8"
+    # reti Docker di OpenVPN e WireGuard (14/10/2026): sono fuori da 172.16.0.0/12 e ci escono tutti i client VPN
+    - "172.101.0.0/24"
+    - "172.102.0.0/24"

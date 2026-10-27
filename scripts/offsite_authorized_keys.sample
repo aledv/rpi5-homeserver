@@ -1,0 +1,2 @@
+# Chiave del tunnel del RPi4 rpi-backup (/root/.ssh/id_offsite sul RPi4), solo inoltri remoti (18000 rest-server, 17007 Dozzle, 19001 Portainer, 127.0.0.1:10022 SSH di manutenzione dal .30)
+restrict,port-forwarding,permitlisten="172.20.0.1:18000",permitlisten="172.20.0.1:17007",permitlisten="172.20.0.1:19001",permitlisten="127.0.0.1:10022" ssh-ed25519 <CHIAVE_PUBBLICA_DEL_TUNNEL> rpi-backup-tunnel
