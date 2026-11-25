@@ -22,4 +22,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.101.0.0/24
+        - subnet: 10.101.0.0/24  # 25/11/2026: era 172.101.0.0/24 (indirizzi pubblici: Plex trattava i client VPN come remoti)

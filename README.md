@@ -36,7 +36,7 @@ usernames are read from local `.env` files that are excluded from git
 - **docker-socket-proxy**: read-only Docker API for the monitoring containers (homepage, Uptime Kuma, Dozzle, Glances, Beszel), so none of them mounts `/var/run/docker.sock`.
 - **dozzle**: real-time Docker log viewer (supports remote agents).
 - **glances**: cross-platform system monitoring.
-- **homeassistant**: home automation platform (exposes the cameras and the Ring alarm to Apple HomeKit through its HomeKit bridge).
+- **homeassistant**: home automation platform (exposes the cameras, the Ring alarm and a BTicino video intercom to Apple HomeKit through its HomeKit bridge; vendored custom components in `homeassistant/custom_components`).
 - **homepage**: application dashboard with Docker and service API integrations (bring your own `services.yaml`, `widgets.yaml`, … in `homepage/config/`: `install_containers.sh` copies them to `/mnt/external_drive/homepage`).
 - **hp-150nw-monitor**: REST API with the status and toner levels of an HP Color Laser 150nw, for a Homepage widget ([aledv/hp-150nw-monitor](https://github.com/aledv/hp-150nw-monitor)).
 - **mailserver**: full mail server (SMTP, IMAP, Rspamd anti-spam) based on docker-mailserver.
@@ -51,7 +51,7 @@ usernames are read from local `.env` files that are excluded from git
 - **paperless** (+ PostgreSQL, Valkey, Tika, Gotenberg): document archive with OCR, full-text search and optional AI features (title/tag suggestions, document chat, semantic search) through an Ollama server on your LAN, or nightly classification with [paperless-ai-classify](https://github.com/aledv/paperless-ai-classify) (`OLLAMA_URL`, e.g. `qwen3:4b-instruct` + `bge-m3` on a CPU-only mini PC). Drop files in `/mnt/external_drive/paperless/consume` (subfolders become tags).
 - **photoprism** (+ MariaDB): AI-powered photo management.
 - **pihole**: network-wide ad blocker and local DNS. Everything is in the repo: DNS settings as `FTLCONF_*` variables in the compose file (Quad9 + Cloudflare upstreams, DNSSEC, NTP off), blocklists in `pihole/adlists.txt` (applied by `pihole/apply_adlists.sh`, `--check` for a dry run), local records in `pihole/local_dns_hosts.txt` (applied by `pihole/apply_local_dns.sh`).
-- **plex**: media server.
+- **plex**: media server. Its "LAN Networks" setting (`LanNetworksBandwidth` in `Preferences.xml`) lists the home LAN and the VPN networks (the OpenVPN/WireGuard container networks clients are NATed from, plus the client pools), so VPN clients count as local. Those container networks must be private ranges (here `10.101.0.0/24` and `10.102.0.0/24`): with non-RFC1918 addresses Plex treats VPN clients as remote.
 - **portainer**: container management UI.
 - **pure-ftpd**: FTP server.
 - **ring-mqtt**: Ring alarm in Home Assistant through MQTT.

@@ -1,6 +1,6 @@
 services:
   glances:
-    image: nicolargo/glances:4.5.8@sha256:32ccbc559baa624bd41419c9a1daf2c32b391dfbee106434186a52bccd164ac7  # aggiornata in automatico il 14/10/2026 (era v4.5.7@0d955eb3cff5…)
+    image: nicolargo/glances:4.5.9@sha256:1d994d181732cfbf68b7c5826a1f71b89624e3eaaa2fe28b28048b2f61b200d7  # aggiornata in automatico il 08/11/2026 (era 4.5.8@32ccbc559baa…)
     container_name: glances
     restart: unless-stopped
     network_mode: host

@@ -23,7 +23,8 @@
 # m h  dom mon dow   command
 # Backup notturno: log in /mnt/external_drive/utility/logs (uno al giorno, tenuti 14 giorni; daily_backup_latest.txt = ultimo); notifica SOLO in caso di errore (dal 14/10/2026; esito OK nel report del mattino), con allegati gli errori (daily_backup_errors.txt) se ce ne sono
 0 2 * * * flock -n -E 75 /run/lock/daily_backup.lock /bin/bash -c 'L=/mnt/external_drive/utility/logs; mkdir -p $L; F=$L/daily_backup_$(date +\%F).txt; /mnt/external_drive/utility/daily_backup.sh > $F 2>&1; rc=$?; ln -sfn $F $L/daily_backup_latest.txt; find $L -name "daily_backup_2*.txt" -mtime +14 -delete; case $rc in 0) exit 0;; 1) m="Message from RPi5: Backup completato, ma con errori nella manutenzione (dettagli in allegato)";; *) m="Message from RPi5: Backup FALLITO (Backrest, codice $rc)";; esac; E=$L/daily_backup_errors.txt; if [ $rc -ne 0 ] && [ -s $E ]; then curl -s -X POST http://localhost:5000/notify -F "message=$m" -F "file=@$E" >/dev/null; else curl -s -X POST http://localhost:5000/notify -F "message=$m" >/dev/null; fi'; [ $? -eq 75 ] && curl -s -X POST http://localhost:5000/notify -F "message=Message from RPi5: backup notturno saltato, il precedente è ancora in corso" >/dev/null
-0 4 1 * * /bin/bash -c '/mnt/external_drive/utility/renew_cert.sh > /tmp/renew_cert.txt 2>&1 && curl -X POST http://localhost:5000/notify -F "message=Rinnovo certificati per mailserver.example.com eseguito!" -F "file=@/tmp/renew_cert.txt"'
+# Certificato mailserver.example.com: ogni lunedì; rinnova solo sotto i 29 giorni, notifica solo rinnovo o errore (log in utility/logs/renew_cert_latest.txt)
+0 4 * * 1 /mnt/external_drive/utility/renew_cert.sh
 
 # CrowdSec: tiene l IP pubblico di casa nell allowlist (non va mai bloccato)
 */5 * * * * /mnt/external_drive/my_rpi_scripts/scripts/crowdsec_allow_myip.sh >> /mnt/external_drive/crowdsec/allow_myip.log 2>&1

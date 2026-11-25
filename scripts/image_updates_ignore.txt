@@ -3,3 +3,4 @@
 nextcloud  mariadb   major   # Nextcloud 35 supporta MariaDB fino alla 12.3 (passati a 11.8 LTS il 29/09)
 photoprism mariadb   major   # nessun vantaggio, richiede dump e reimport
 umami      postgres  major   # nessun vantaggio, cambio di major di PostgreSQL = dump e reimport
+paperless  docker.io/library/postgres  major   # 20/11/2026: major = pg_upgrade o dump+restore su volume nuovo; si fa a mano (fallito in automatico 18.7->19.0)

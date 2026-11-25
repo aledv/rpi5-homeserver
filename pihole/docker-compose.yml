@@ -1,6 +1,6 @@
 services:
   pihole:
-    image: pihole/pihole:2026.10.0@sha256:d34134716fc32038b052a8674c7c6879e0ff21f0e6d8af345166fffa2c27c113  # aggiornata in automatico il 18/10/2026 (era 2026.09.0@5b9c8cf51de7…)
+    image: pihole/pihole:2026.11.0@sha256:66c798d79a95c2691f280329c3611dba1746117c61c9f331907ca35a06a52778  # aggiornata in automatico il 12/11/2026 (era 2026.10.1@30f803ad5dd6…)
     container_name: pihole
     #network_mode: "host" # Necessario per Pi-hole per gestire le richieste DNS
     ports:

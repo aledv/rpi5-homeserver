@@ -7,7 +7,7 @@
 # Per importare: copiare i file in /mnt/external_drive/paperless/consume (le sottocartelle diventano tag; i file vengono spostati nell'archivio).
 services:
   paperless-broker:
-    image: docker.io/valkey/valkey:9-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b  # aggiornata in automatico il 27/10/2026 (era 9-alpine@48332870af35…)
+    image: docker.io/valkey/valkey:9-alpine@sha256:c8e2d17498838af5d91e12eb7c11220b3434a7b7131a333e3af52ad5e0b80882  # aggiornata in automatico il 20/11/2026 (era 9-alpine@56729e68bdda…)
     container_name: paperless-broker
     healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
       test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
@@ -21,7 +21,7 @@ services:
     mem_limit: 128m
 
   paperless-db:
-    image: docker.io/library/postgres:18.6@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6  # aggiornata in automatico il 22/10/2026 (era 18.6@5486e8fb2069…)
+    image: docker.io/library/postgres:18.7@sha256:c699303802144847d238196173655dbbecf7a96aeca1565f2b02eb671a1f0b6b  # aggiornata in automatico il 25/11/2026 (era 18.7@f5cbc081c256…)
     container_name: paperless-db
     healthcheck:  # aggiunto il 21/10/2026: Kuma e homepage vedono se risponde, non solo se è acceso
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
@@ -40,7 +40,7 @@ services:
     mem_limit: 512m
 
   paperless:
-    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.4@sha256:9bc6e8248891bcfa6f52fffe8b81e4ea8cae75790c3ec1b9906961a7ba55c969  # aggiornata in automatico il 23/10/2026 (era 3.3.3@dba0242c1df1…)
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.5.1@sha256:8508853b8a0f8394074260957d0be186c8c64f346973b24a7583de4580f306b9  # aggiornata in automatico il 18/11/2026 (era 3.5.0@8c1e2c4e0abb…)
     container_name: paperless
     restart: unless-stopped
     depends_on:
@@ -93,7 +93,7 @@ services:
     mem_limit: 2g
 
   paperless-gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.38@sha256:aa552cc115db488e0f0bcb07446aac13071ad51505b642c84bb894500907b42b  # aggiornata in automatico il 16/10/2026 (era 8.37, senza digest)
+    image: docker.io/gotenberg/gotenberg:9.9@sha256:9731688d1b6290e4c04d9a47dbd5fb29f92aa0076feb6592c5c777525892cd72  # aggiornata in automatico il 23/11/2026 (era 9.9@f6b4b6f7c8ae…)
     container_name: paperless-gotenberg
     restart: unless-stopped
     command:
@@ -103,7 +103,7 @@ services:
     mem_limit: 768m
 
   paperless-tika:
-    image: docker.io/apache/tika:3.3.3.0@sha256:326b238b37904c94ff61fed87afe0af72e6a29fa715933b10af97b7d56f1d4cb  # aggiornata in automatico il 22/10/2026 (era 3.3.1.0, senza digest)
+    image: docker.io/apache/tika:3.3.3.1@sha256:3049611264bb18cf66e6629f59818cad75ea5d46f770c504ae46537949838c67  # aggiornata in automatico il 21/11/2026 (era 3.3.3.0@326b238b3790…)
     container_name: paperless-tika
     restart: unless-stopped
     mem_limit: 768m

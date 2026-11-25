@@ -115,6 +115,15 @@ copy_files() {
         echo "File cleanup_camera_recordings.sh copiato in /mnt/external_drive/utility."
     fi
 
+    # Home Assistant: pacchetti YAML e custom components dal repo (27/10/2026: prima i pacchetti si copiavano a mano)
+    if [ -d "homeassistant/packages" ]; then
+        sudo mkdir -p /mnt/external_drive/homeassistant/config/packages /mnt/external_drive/homeassistant/config/custom_components
+        sudo cp homeassistant/packages/*.yaml /mnt/external_drive/homeassistant/config/packages/
+        for c in homeassistant/custom_components/*/; do
+            [ -d "$c" ] && sudo cp -r "$c" /mnt/external_drive/homeassistant/config/custom_components/
+        done
+    fi
+
     # Copia scanner_nextcloud_rescan.sh sotto /mnt/external_drive/utility (cron di root: scansioni del tasto PDF in Nextcloud)
     if [ -f "scripts/scanner_nextcloud_rescan.sh" ]; then
         sudo install -m 755 "scripts/scanner_nextcloud_rescan.sh" /mnt/external_drive/utility/scanner_nextcloud_rescan.sh

@@ -4,7 +4,7 @@
 # scripts/divanni_repos_update.py (cron): the folder is mounted, not the file, so the atomic replace is seen at once.
 services:
   website:
-    image: ghcr.io/aledv/divanni-me:0d708d4@sha256:940c254809a245df4828a4c53f7ac4d786059b016497d6c79d8242c98bedca48
+    image: ghcr.io/aledv/divanni-me:72efc66@sha256:73ffc3328731a74ff9b49f4bd499304cae90381b67b8266593df7e846b2622d2
     container_name: website
     restart: unless-stopped
     ports:

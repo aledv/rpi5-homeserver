@@ -7,7 +7,7 @@
 # ups-notify: avvisi Telegram + email (notifier) a ogni cambio di stato, con coda se il notifier non risponde.
 services:
   apcupsd:
-    image: gregewing/apcupsd:latest@sha256:cc256387ccac15b46788de3a3b219758ea957f2b85a99b114d0293ac3130e29c  # fissata il 29/09/2026 (era gregewing/apcupsd:latest)
+    image: gregewing/apcupsd:latest@sha256:3f79af9ef5008c43992ec901aa2e98c6e9bc5db46fd3e999d6dae09b594c37c4  # aggiornata in automatico il 21/11/2026 (era latest@b3ede1f3af52…)
     container_name: apcupsd
     devices:
       - /dev/usb/hiddev0 # Dispositivo per la connessione APC UPS

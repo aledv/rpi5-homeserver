@@ -11,7 +11,7 @@ Esclusi: note Joplin, .md/.sql e formati che Paperless non legge. Token API: PAP
 Uso: paperless_sync.py          sincronizza
      paperless_sync.py --seed   collega i file già importati ai documenti, senza copiare né cancellare
 """
-import hashlib, json, os, shutil, sys, urllib.request
+import hashlib, http.client, json, os, shutil, sys, time, urllib.error, urllib.request
 
 USER = os.environ["NEXTCLOUD_USER"]
 TOKEN = os.environ.get("PAPERLESS_TOKEN", "")
@@ -26,11 +26,21 @@ UID = GID = 1000            # USERMAP_UID/GID di Paperless
 MAX_DELETE = 20             # oltre questo numero di cancellazioni in una notte: nessuna cancellazione, errore
 SEED = "--seed" in sys.argv
 
-def api(path, method="GET"):
+def api(path, method="GET", tries=6):
+    # Più tentativi solo sugli errori di connessione: di notte l'aggiornamento di Docker (apt nel backup) può riavviare
+    # Paperless poco prima di questo script, che altrimenti trova la connessione chiusa (17/11/2026).
     r = urllib.request.Request(API + path, method=method, headers={"Authorization": "Token " + TOKEN, "Accept": "application/json"})
-    with urllib.request.urlopen(r, timeout=60) as resp:
-        body = resp.read()
-    return json.loads(body) if body else None
+    for n in range(tries):
+        try:
+            with urllib.request.urlopen(r, timeout=60) as resp:
+                body = resp.read()
+            return json.loads(body) if body else None
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, http.client.HTTPException, ConnectionError, TimeoutError):
+            if n == tries - 1:
+                raise
+            time.sleep(30)
 
 def doc_by_sha(sha):
     r = api(f"/documents/?checksum__iexact={sha}&fields=id")["results"]

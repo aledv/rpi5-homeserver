@@ -4,7 +4,7 @@
 # (IP pubblico aggiornato da scripts/crowdsec_allow_myip.sh).
 services:
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.8.1
+    image: crowdsecurity/crowdsec:v1.8.2@sha256:65b74942f7e7ed5c60fde4ac15fc4ba715904c398c8b16dd451f4907d90347d4  # aggiornata in automatico il 30/10/2026 (era v1.8.1, senza digest)
     container_name: crowdsec
     restart: always
     dns:

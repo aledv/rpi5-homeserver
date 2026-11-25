@@ -3,7 +3,7 @@
 # .env and secrets/ (Google service account key) in /mnt/external_drive/my-telegram-bot, outside git.
 services:
   my-telegram-bot:
-    image: ghcr.io/aledv/my_telegram_bot:72e4e3c@sha256:ed3cfcbf35ac75b50de41d3e3a2aac64cccb8ae688cb0f5d5d76ae1a4b04d56b
+    image: ghcr.io/aledv/my_telegram_bot:d3ff47e@sha256:75f27d60f18689ac0f0e3e07da4738ce3215201ec395b1c1e3a26074be1e4c00
     container_name: my-telegram-bot
     restart: unless-stopped
     # www-data: files saved into Nextcloud folders stay manageable by Nextcloud

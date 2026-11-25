@@ -29,7 +29,7 @@ services:
       EMAIL_SENDER_NAME: Scanner
       PRINTER: ${PRINTER_QUEUE}
     volumes:
-      - /run/cups/cups.sock:/run/cups/cups.sock                                   # COPY: print with the host's CUPS queue
+      - /run/cups:/run/cups                                                       # COPY: print with the host's CUPS queue (folder, not file: the socket changes on every CUPS restart)
       - /mnt/external_drive/paperless/consume:/consume                                    # SCAN → Paperless
       - /mnt/external_drive/nextcloud/nextcloud_data/data/${NEXTCLOUD_USER}/files/Scansioni:/output   # PDF → Nextcloud
       - /mnt/external_drive/scanner-buttons/flags:/flags                                  # flag for the cron job: Nextcloud rescan

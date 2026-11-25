@@ -7,5 +7,5 @@ exec docker run --rm --network host \
   -e PAPERLESS_URL=http://localhost:8010 \
   -e OLLAMA_URL=http://192.168.1.101:11434 -e OLLAMA_MODEL=qwen3.5:4b \
   -e DOC_LANGUAGE=Italian -e "TAG_REVIEW=AI da verificare" -e "TAG_SEEN=AI visto" \
-  -e STOP_AT=06:30 -e MAX_DOCS=400 \
-  ghcr.io/aledv/paperless-ai-classify:f7fc2e4@sha256:bb2201ec288ad20a537d47e9d3658915c400dd0f8e660e427e7f40d3a822421f "$@"
+  -e STOP_AT=06:30 -e MAX_DOCS=400 -e "EXCLUDE_TYPES=Certificazione fiscale" \
+  ghcr.io/aledv/paperless-ai-classify:8a7b4e1@sha256:bf475ef68073134dcc2d38c55e20abc4a9d286fa62223b46d84333a71751f8d7 "$@"

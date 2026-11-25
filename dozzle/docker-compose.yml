@@ -1,7 +1,7 @@
 services:
   dozzle:
     container_name: dozzle
-    image: amir20/dozzle:v11.3.5@sha256:dd09e6aaa9d5ad686b6017427a502c40dc862ba28445609813e5ea1f66f6dbdf  # aggiornata in automatico il 25/10/2026 (era v11.3.4@8796ae7e1ecb…)
+    image: amir20/dozzle:v11.5.0@sha256:74600d62dd73a72a5d36fbd0c98af649203df921d74310b7ed383ef63392358e  # aggiornata in automatico il 20/11/2026 (era v11.4.3@244f218c876d…)
     restart: unless-stopped # senza, dopo un aggiornamento o un riavvio resta fermo
     environment:
       # DOZZLE_REMOTE_AGENT: 192.168.1.101:7007   # opzionale: agent Dozzle su altri host, separati da virgola

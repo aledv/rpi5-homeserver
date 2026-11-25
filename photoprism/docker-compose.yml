@@ -1,6 +1,6 @@
 services:
   photoprism:
-    image: photoprism/photoprism:261007@sha256:0f85369636ad99ca9a1c33f2d04df6c590802d16b7c33b4a1ea026b595be06d1  # aggiornata in automatico il 14/10/2026 (era 260919@cea1af8ce28b…)
+    image: photoprism/photoprism:261029@sha256:9409cf8e5a6ebcbe3170d14537556cbc20997aaa307096d6eeedbfc5eeef6719  # aggiornata in automatico il 31/10/2026 (era 261007@0f85369636ad…)
     container_name: photoprism
     mem_limit: 2g # limite anti-picchi (2026-09-25)
     restart: unless-stopped
@@ -67,7 +67,7 @@ services:
       - network  # Modifica da photoprism_network a shared_network
 
   mariadb:
-    image: mariadb:11.8.9@sha256:6a4b3c20cffebc8b2d9248924f6a63285176c15a532b8e4840b8804e1c2c0443  # aggiornata in automatico il 27/10/2026 (era 11.8.9@f16d7a344413…)
+    image: mariadb:11.8.9@sha256:e1d5495f445654134f226f55a41ce0da227116f6f27f283101f405c794d841fc  # aggiornata in automatico il 20/11/2026 (era 11.8.9@d36f18d65a04…)
     container_name: photoprism_db
     restart: unless-stopped
     stop_grace_period: 60s # tempo per chiudere InnoDB in modo pulito (con 5s serviva il crash recovery)

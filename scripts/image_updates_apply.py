@@ -74,8 +74,23 @@ def block_of(lines, idx):
     return svc, cname
 
 
+def wait_ready(cname, wait=180):
+    """Attende che il container sia running (e healthy se ha un healthcheck), senza la pausa di stabilita' di healthy().
+    Serve prima di un dump: dopo un rollback il DB puo' essere ancora in avvio (socket assente, 20/11/2026)."""
+    t0 = time.time()
+    while time.time() - t0 < wait:
+        fmt = "{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}"
+        rc, so, _ = run(f"docker inspect {cname} --format '{fmt}'")
+        if rc == 0 and so.split() in (["running", "healthy"], ["running", "none"]):
+            return True
+        time.sleep(5)
+    return False
+
+
 def dump_db(cname, image, dest):
     dest.mkdir(parents=True, exist_ok=True)
+    if not wait_ready(cname):
+        raise RuntimeError(f"{cname} non e' pronto: dump non eseguito")
     out = dest / f"{cname}.sql"
     if "postgres" in image:
         cmd = f"docker exec {cname} sh -c 'pg_dumpall -U \"$POSTGRES_USER\"'"
@@ -200,6 +215,7 @@ def main():
             if rc != 0 or not healthy(cname):
                 compose.write_text(original)
                 run("docker compose up -d", cwd=compose.parent)
+                wait_ready(cname)
                 raise RuntimeError("servizio non sano dopo l'aggiornamento: ripristinata la versione precedente" + (f" ({se[:150]})" if rc else ""))
             res.update(result="applied", note=f"{cur_tag} -> {target}", digest=dig)
             applied_msgs.append(f"{svc_dir}: {image} {cur_tag} -> {target}" + (" (ricostruita)" if kind == "rebuild" else ""))
@@ -207,6 +223,7 @@ def main():
             if compose.read_text() != original:
                 compose.write_text(original)
                 run("docker compose up -d", cwd=compose.parent)
+                wait_ready(cname)
             res.update(result="failed", note=str(e)[:300])
         results.append(res)
     if applied_msgs and not DRY:

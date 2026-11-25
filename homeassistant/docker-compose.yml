@@ -7,7 +7,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    image: ghcr.io/home-assistant/home-assistant:2026.10.4@sha256:23f4dfbb69ce76315dbc4de7915504f1c2dcecd7ca2648113a493a385972e133  # aggiornata in automatico il 25/10/2026 (era 2026.10.3@407b89cd11a8…)
+    image: ghcr.io/home-assistant/home-assistant:2026.11.3@sha256:24e541ddae5818bf8eb27898b9ba00d0c344a655aa5097e9e9bd4b19356be847  # aggiornata in automatico il 24/11/2026 (era 2026.11.2@493a07e8f653…)
     restart: unless-stopped
     network_mode: host
     # 27/09: al posto di privileged, solo cio che serve:

@@ -8,6 +8,4 @@ whitelist:
     - "10.0.0.0/8"
     - "172.16.0.0/12"
     - "127.0.0.0/8"
-    # reti Docker di OpenVPN e WireGuard (14/10/2026): sono fuori da 172.16.0.0/12 e ci escono tutti i client VPN
-    - "172.101.0.0/24"
-    - "172.102.0.0/24"
+    # reti Docker di OpenVPN e WireGuard: dal 25/11/2026 10.101.0.0/24 e 10.102.0.0/24, già coperte da 10.0.0.0/8

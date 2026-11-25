@@ -1,6 +1,6 @@
 services:
   stirling-pdf:
-    image: stirlingtools/stirling-pdf:3.2.2@sha256:c6872dd056b0046a14c5de1e9970283e7f1e1ff685bb08090c6b37a231127d31  # aggiornata in automatico il 25/10/2026 (era 3.2.1@f95b691c3df4…)
+    image: stirlingtools/stirling-pdf:3.5.0@sha256:f5a38801f2dd551c26d0089ee3ea48d86a565e3adb414cb31e974bc9562cb48a  # aggiornata in automatico il 22/11/2026 (era 3.4.0@972ffc10fbd6…)
     container_name: stirling-pdf
     mem_limit: 1536m # limite anti-picchi (2026-09-25): JVM 60% heap + LibreOffice on-demand
     ports:

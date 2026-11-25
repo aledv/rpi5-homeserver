@@ -4,7 +4,7 @@
 # 7 days are removed by scripts/cleanup_camera_recordings.sh.
 services:
   camera-app:
-    image: ghcr.io/aledv/yi-hack-cam-dashboard:f0a0298@sha256:3d0addb01b708252db2ce333ca418623b556fc1353f8468a2c8662e5eba47632
+    image: ghcr.io/aledv/yi-hack-cam-dashboard:f4eea2e@sha256:526a6082d1fa73274acc5395cdfd6c654032544bc3f338158fc7ff8c4749b61b
     container_name: camera-app
     restart: unless-stopped
     env_file:
@@ -21,7 +21,7 @@ services:
       - shared_network
 
   mediamtx:
-    image: bluenviron/mediamtx:1.21.3@sha256:59e43552f3be43695b70c19424dc2a42fcec18075f88d91561a24ac5d70a586c  # aggiornata in automatico il 26/10/2026 (era 1.21.2@c7540465f868…)
+    image: bluenviron/mediamtx:1.21.4@sha256:c730bccdbc8739f8f0c13cefe9bea8b61926f599b88fa4d0d229baa91846c7bc  # aggiornata in automatico il 16/11/2026 (era 1.21.3@59e43552f3be…)
     container_name: mediamtx
     restart: unless-stopped
     volumes:

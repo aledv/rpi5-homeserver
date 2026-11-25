@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BTicinoアカウント認証情報",
+        "description": "Netatmo/BTicinoアカウントの認証情報とAPIキーを入力してください。",
+        "data": {
+          "username": "ユーザー名（メールアドレス）",
+          "password": "パスワード",
+          "client_id": "クライアントID（APIキー）",
+          "client_secret": "クライアントシークレット"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "BTicino/Netatmo APIに接続できません。ネットワーク接続を確認してください。",
+      "invalid_auth": "ユーザー名、パスワード、またはAPI認証情報が無効です。",
+      "unknown": "不明なエラーが発生しました。"
+    },
+    "abort": {
+      "already_configured": "アカウントは既に設定されています。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BTicino照明オプション",
+        "description": "BTicino照明の動作を設定",
+        "data": {
+          "light_as_lock": "照明リレーをロックとして使用（代替設定）"
+        }
+      }
+    },
+    "abort": {
+      "cannot_connect": "接続できません。後でもう一度お試しください。"
+    },
+    "error": {
+      "cannot_connect": "接続できません。後でもう一度お試しください。"
+    }
+  },
+  "entity": {
+    "lock": {
+      "external_door": {
+        "name": "外部ドア"
+      },
+      "internal_door": {
+         "name": "内部ドア"
+      }
+    },
+     "binary_sensor": {
+       "call": {
+         "name": "通話"
+       }
+     }
+  }
+}
